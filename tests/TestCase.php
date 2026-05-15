@@ -9,8 +9,6 @@ class TestCase extends Orchestra
 {
     protected function getPackageProviders($app): array
     {
-        return [
-            MikrotikServiceProvider::class,
-        ];
+        return [MikrotikServiceProvider::class];
     }
 }
