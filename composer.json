@@ -1,16 +1,53 @@
 {
     "name": "zilleali/mikrotik-laravel",
-    "description": "MikroTik RouterOS API for Laravel",
+    "description": "MikroTik RouterOS API for Laravel — PPPoE, Hotspot, Queues & Monitoring",
+    "keywords": ["mikrotik", "routeros", "laravel", "isp", "pppoe", "hotspot", "networking"],
     "type": "library",
-    "require": {
-        "php": "^8.1",
-        "illuminate/support": "^10.0|^11.0|^12.0"
-    },
     "license": "MIT",
     "authors": [
         {
             "name": "Zill E Ali",
-            "email": "zilleali1245@gmail.com"
+            "email": "zilleali1245@gmail.com",
+            "homepage": "https://zilleali.com",
+            "role": "Developer"
         }
-    ]
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0",
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "ZillEAli\\MikrotikLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZillEAli\\MikrotikLaravel\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ZillEAli\\MikrotikLaravel\\MikrotikServiceProvider"
+            ],
+            "aliases": {
+                "MikroTik": "ZillEAli\\MikrotikLaravel\\Facades\\MikroTik"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
