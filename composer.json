@@ -1,7 +1,15 @@
 {
     "name": "zilleali/mikrotik-laravel",
     "description": "MikroTik RouterOS API for Laravel — PPPoE, Hotspot, Queues & Monitoring",
-    "keywords": ["mikrotik", "routeros", "laravel", "isp", "pppoe", "hotspot", "networking"],
+    "keywords": [
+        "mikrotik",
+        "routeros",
+        "laravel",
+        "isp",
+        "pppoe",
+        "hotspot",
+        "networking"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -17,9 +25,9 @@
         "illuminate/support": "^10.0|^11.0|^12.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0",
         "pestphp/pest": "^2.0",
         "pestphp/pest-plugin-laravel": "^2.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
     "config": {
