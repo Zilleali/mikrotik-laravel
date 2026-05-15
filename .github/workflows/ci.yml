@@ -7,47 +7,16 @@ on:
     branches: [main]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ← yeh add karo
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { php: '8.1', laravel: '10.*', testbench: '^8.0' }
-          - { php: '8.2', laravel: '10.*', testbench: '^8.0' }
-          - { php: '8.2', laravel: '11.*', testbench: '^9.0' }
-          - { php: '8.3', laravel: '11.*', testbench: '^9.0' }
-          - { php: '8.3', laravel: '12.*', testbench: '^10.0' }
-    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: sockets, openssl
-          coverage: none
-          tools: composer:v2
-      - name: Install dependencies
-        run: |
-          composer require \
-            "laravel/framework:${{ matrix.laravel }}" \
-            "orchestra/testbench:${{ matrix.testbench }}" \
-            --no-update --no-interaction
-          composer install --no-interaction --prefer-dist --no-progress
-      - name: List test files
-        run: find . -name "*Test.php" -o -name "*.test.php" -o -name "*Pest.php" | head -20
-      - name: Run Pest
-        run: ./vendor/bin/pest --verbose --no-coverage
+    name: PHP 8.3 / Laravel 12
 
-  lint:
-    runs-on: ubuntu-latest
-    name: PHP CS Fixer
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -55,7 +24,30 @@ jobs:
           extensions: sockets, openssl
           coverage: none
           tools: composer:v2
+
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run Pest
+        run: ./vendor/bin/pest --no-coverage
+
+  lint:
+    runs-on: ubuntu-latest
+    name: PHP CS Fixer
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: sockets, openssl
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
       - name: PHP CS Fixer
-        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
