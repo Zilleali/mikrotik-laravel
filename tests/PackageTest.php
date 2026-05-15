@@ -1,5 +1,5 @@
 <?php
 
-it('package loads', function () {
+it('package loads successfully', function () {
     expect(true)->toBeTrue();
 });
