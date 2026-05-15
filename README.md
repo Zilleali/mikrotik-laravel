@@ -1,9 +1,9 @@
 # zilleali/mikrotik-laravel
 
-[![Tests](https://github.com/Zilleali/mikrotik-laravel/actions/workflows/ci.yml/badge.svg)](...)
-[![Packagist](https://img.shields.io/packagist/v/zilleali/mikrotik-laravel)](...)
-[![PHP](https://img.shields.io/packagist/php-v/zilleali/mikrotik-laravel)](...)
-[![License](https://img.shields.io/packagist/l/zilleali/mikrotik-laravel)](...)
+[![Tests](https://github.com/Zilleali/mikrotik-laravel/actions/workflows/ci.yml/badge.svg)](https://github.com/Zilleali/mikrotik-laravel/actions)
+[![Packagist](https://img.shields.io/packagist/v/zilleali/mikrotik-laravel)](https://packagist.org/packages/zilleali/mikrotik-laravel)
+[![PHP](https://img.shields.io/packagist/php-v/zilleali/mikrotik-laravel)](https://packagist.org/packages/zilleali/mikrotik-laravel)
+[![License](https://img.shields.io/github/license/Zilleali/mikrotik-laravel)](https://github.com/Zilleali/mikrotik-laravel/blob/main/LICENSE)
 [![MTCNA](https://img.shields.io/badge/MTCNA-Certified-009AC7)](https://zilleali.com)
 
 ## MikroTik RouterOS API for Laravel
