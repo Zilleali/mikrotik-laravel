@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a bug or unexpected behavior
+labels: [bug]
+body:
+  - type: dropdown
+    attributes:
+      label: RouterOS version
+      options: [7.x, 6.49.x, Other]
+  - type: input
+    attributes:
+      label: Package version
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    attributes:
+      label: Expected vs actual behavior
+
+--- feature_request.yml ---
+name: Feature request
+labels: [enhancement]
+body:
+  - type: dropdown
+    attributes:
+      label: Feature area
+      options: [PPPoE, Hotspot, Queue, Interface, Firewall, DHCP, System, Filament widget]
+  - type: textarea
+    attributes:
