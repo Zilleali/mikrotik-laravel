@@ -1,0 +1,16 @@
+{
+    "name": "zilleali/mikrotik-laravel",
+    "description": "MikroTik RouterOS API for Laravel",
+    "type": "library",
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Zill E Ali",
+            "email": "zilleali1245@gmail.com"
+        }
+    ]
+}
