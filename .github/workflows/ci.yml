@@ -13,7 +13,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: PHP 8.3 / Laravel 12
-
     steps:
       - uses: actions/checkout@v4
 
@@ -34,7 +33,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: PHP CS Fixer
-
     steps:
       - uses: actions/checkout@v4
 
