@@ -1,5 +1,8 @@
 name: Tests & Code Quality
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [main, develop]
@@ -10,9 +13,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        php: ['8.1', '8.2', '8.3']
-        laravel: ['10.*', '11.*', '12.*']
+        include:
+          - php: '8.1'
+            laravel: '10.*'
+          - php: '8.2'
+            laravel: '10.*'
+          - php: '8.2'
+            laravel: '11.*'
+          - php: '8.3'
+            laravel: '11.*'
+          - php: '8.3'
+            laravel: '12.*'
 
     steps:
       - uses: actions/checkout@v4
@@ -22,17 +35,35 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: sockets, openssl
-          coverage: xdebug
+          coverage: none
+
+      - name: Cache composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-${{ hashFiles('composer.lock') }}
 
       - name: Install dependencies
-        run: composer require "laravel/framework:${{ matrix.laravel }}" --no-update && composer install
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-update --no-interaction
+          composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run Pest tests
-        run: ./vendor/bin/pest --coverage
+      - name: Run Pest
+        run: ./vendor/bin/pest
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: sockets, openssl
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
       - name: PHP CS Fixer
-        run: composer require friendsofphp/php-cs-fixer --dev && ./vendor/bin/php-cs-fixer fix --dry-run
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff
