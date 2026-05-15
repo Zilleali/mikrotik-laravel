@@ -16,37 +16,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '8.1'
-            laravel: '10.*'
-            testbench: '^8.0'
-          - php: '8.2'
-            laravel: '10.*'
-            testbench: '^8.0'
-          - php: '8.2'
-            laravel: '11.*'
-            testbench: '^9.0'
-          - php: '8.3'
-            laravel: '11.*'
-            testbench: '^9.0'
-          - php: '8.3'
-            laravel: '12.*'
-            testbench: '^10.0'
+          - { php: '8.1', laravel: '10.*', testbench: '^8.0' }
+          - { php: '8.2', laravel: '10.*', testbench: '^8.0' }
+          - { php: '8.2', laravel: '11.*', testbench: '^9.0' }
+          - { php: '8.3', laravel: '11.*', testbench: '^9.0' }
+          - { php: '8.3', laravel: '12.*', testbench: '^10.0' }
+
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP ${{ matrix.php }}
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: sockets, openssl
           coverage: none
-
-      - name: Cache composer packages
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-${{ hashFiles('composer.json') }}
 
       - name: Install dependencies
         run: |
@@ -61,6 +47,8 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    name: PHP CS Fixer
+
     steps:
       - uses: actions/checkout@v4
 
