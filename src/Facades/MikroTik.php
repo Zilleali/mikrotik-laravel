@@ -28,8 +28,12 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static WirelessManager   wireless()
  * @method static IpPoolManager    ipPools()
  * @method static RadiusManager    radius()
- * 
- *
+ * @method static RouterUserManager routerUsers()
+ *@method static void dispatchSessionCreated(string $username, string $ip, string $service = 'pppoe', ?string $mac = null)
+ * @method static void dispatchSessionDisconnected(string $username, ?string $ip = null, ?string $uptime = null, string $reason = 'manual')
+
+
+
  * @see MikrotikManager
  *
  * @package ZillEAli\MikrotikLaravel\Facades
