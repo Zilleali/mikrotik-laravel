@@ -12,6 +12,8 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 use ZillEAli\MikrotikLaravel\Services\WirelessManager;
+use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
+use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 
 /**
  * MikrotikManager
@@ -304,5 +306,25 @@ class MikrotikManager
     public function wireless(): WirelessManager
     {
         return new WirelessManager($this->getClient());
+    }
+
+    /**
+     * Get IP Pool manager for the current router.
+     *
+     * @return IpPoolManager
+     */
+    public function ipPool(): IpPoolManager
+    {
+        return new IpPoolManager($this->getClient());
+    }
+
+    /**
+     * Get RADIUS manager for the current router.
+     *
+     * @return RadiusManager
+     */
+    public function radius(): RadiusManager
+    {
+        return new RadiusManager($this->getClient());
     }
 }
