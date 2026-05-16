@@ -21,6 +21,8 @@ use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // VPN Manager for WireGuard and OpenVPN support
+
 
 /**
  * MikrotikManager
@@ -432,5 +434,17 @@ class MikrotikManager
             uptime: $uptime,
             reason: $reason,
         ));
+    }
+
+    /**
+     * Get VPN manager for the current router.
+     *
+     * Supports WireGuard peers, L2TP sessions, PPTP sessions.
+     *
+     * @return VpnManager
+     */
+    public function vpn(): VpnManager
+    {
+        return new VpnManager($this->getClient());
     }
 }
