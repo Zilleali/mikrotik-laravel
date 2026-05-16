@@ -26,6 +26,8 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static DhcpManager      dhcp()
  * @method static InterfaceManager  interfaces()
  * @method static WirelessManager   wireless()
+ * @method static IpPoolManager    ipPools()
+ * @method static RadiusManager    radius()
  * 
  *
  * @see MikrotikManager
