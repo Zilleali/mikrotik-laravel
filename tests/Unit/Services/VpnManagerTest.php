@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\VpnManager;
 
 function makeVpnClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -28,7 +35,7 @@ it('returns wireguard interfaces', function () {
         ],
     ]);
 
-    $manager    = new VpnManager($client);
+    $manager = new VpnManager($client);
     $interfaces = $manager->getWireGuardInterfaces();
 
     expect($interfaces)->toHaveCount(2)
@@ -42,17 +49,17 @@ it('returns wireguard peers', function () {
     $client = makeVpnClient([
         '/interface/wireguard/peers/print' => [
             [
-                'interface'  => 'wg0',
+                'interface' => 'wg0',
                 'public-key' => 'abc123==',
                 'endpoint-address' => '1.2.3.4',
-                'endpoint-port'    => '13231',
-                'allowed-address'  => '10.8.0.2/32',
+                'endpoint-port' => '13231',
+                'allowed-address' => '10.8.0.2/32',
             ],
         ],
     ]);
 
     $manager = new VpnManager($client);
-    $peers   = $manager->getWireGuardPeers();
+    $peers = $manager->getWireGuardPeers();
 
     expect($peers)->toHaveCount(1)
         ->and($peers[0]['public-key'])->toBe('abc123==')
@@ -60,7 +67,7 @@ it('returns wireguard peers', function () {
 });
 
 it('returns empty array when no wireguard peers', function () {
-    $client  = makeVpnClient(['/interface/wireguard/peers/print' => []]);
+    $client = makeVpnClient(['/interface/wireguard/peers/print' => []]);
     $manager = new VpnManager($client);
 
     expect($manager->getWireGuardPeers())->toBeEmpty();
@@ -77,7 +84,7 @@ it('returns peers for specific wireguard interface', function () {
     ]);
 
     $manager = new VpnManager($client);
-    $peers   = $manager->getWireGuardPeersByInterface('wg0');
+    $peers = $manager->getWireGuardPeersByInterface('wg0');
 
     expect($peers)->toHaveCount(1)
         ->and($peers[0]['interface'])->toBe('wg0');
@@ -86,14 +93,14 @@ it('returns peers for specific wireguard interface', function () {
 // ─── addWireGuardPeer ─────────────────────────────────────────
 
 it('adds wireguard peer without throwing', function () {
-    $client  = makeVpnClient();
+    $client = makeVpnClient();
     $manager = new VpnManager($client);
 
     expect(fn () => $manager->addWireGuardPeer([
-        'interface'       => 'wg0',
-        'public-key'      => 'newpeerkey==',
+        'interface' => 'wg0',
+        'public-key' => 'newpeerkey==',
         'allowed-address' => '10.8.0.3/32',
-        'comment'         => 'branch office',
+        'comment' => 'branch office',
     ]))->not->toThrow(\Exception::class);
 });
 
@@ -122,7 +129,7 @@ it('returns active l2tp sessions', function () {
         ],
     ]);
 
-    $manager  = new VpnManager($client);
+    $manager = new VpnManager($client);
     $sessions = $manager->getL2tpSessions();
 
     expect($sessions)->toHaveCount(2)
@@ -131,7 +138,7 @@ it('returns active l2tp sessions', function () {
 });
 
 it('returns empty array when no l2tp sessions', function () {
-    $client  = makeVpnClient(['/interface/l2tp-server/session/print' => []]);
+    $client = makeVpnClient(['/interface/l2tp-server/session/print' => []]);
     $manager = new VpnManager($client);
 
     expect($manager->getL2tpSessions())->toBeEmpty();
@@ -146,7 +153,7 @@ it('returns active pptp sessions', function () {
         ],
     ]);
 
-    $manager  = new VpnManager($client);
+    $manager = new VpnManager($client);
     $sessions = $manager->getPptpSessions();
 
     expect($sessions)->toHaveCount(1)
@@ -176,14 +183,14 @@ it('returns l2tp server secrets', function () {
 
 it('returns total active vpn session count', function () {
     $client = makeVpnClient([
-        '/interface/wireguard/peers/print'      => [
+        '/interface/wireguard/peers/print' => [
             ['interface' => 'wg0', 'current-endpoint-address' => '1.2.3.4'],
             ['interface' => 'wg0', 'current-endpoint-address' => '5.6.7.8'],
         ],
-        '/interface/l2tp-server/session/print'  => [
+        '/interface/l2tp-server/session/print' => [
             ['name' => 'l2tp-1', 'user' => 'branch1'],
         ],
-        '/interface/pptp-server/session/print'  => [],
+        '/interface/pptp-server/session/print' => [],
     ]);
 
     $manager = new VpnManager($client);

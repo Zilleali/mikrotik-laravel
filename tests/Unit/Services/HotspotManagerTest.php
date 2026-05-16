@@ -7,8 +7,9 @@ use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 
 function makeHotspotClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
 
@@ -17,8 +18,14 @@ function makeHotspotClient(array $responses = []): RouterosClient
             return $this->responses[$command] ?? [];
         }
 
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -33,7 +40,7 @@ it('returns all hotspot users', function () {
     ]);
 
     $manager = new HotspotManager($client);
-    $users   = $manager->getUsers();
+    $users = $manager->getUsers();
 
     expect($users)->toHaveCount(2)
         ->and($users[0]['name'])->toBe('user1')
@@ -41,7 +48,7 @@ it('returns all hotspot users', function () {
 });
 
 it('returns empty array when no hotspot users exist', function () {
-    $client  = makeHotspotClient(['/ip/hotspot/user/print' => []]);
+    $client = makeHotspotClient(['/ip/hotspot/user/print' => []]);
     $manager = new HotspotManager($client);
 
     expect($manager->getUsers())->toBeEmpty();
@@ -57,14 +64,14 @@ it('returns single hotspot user by name', function () {
     ]);
 
     $manager = new HotspotManager($client);
-    $user    = $manager->getUser('user1');
+    $user = $manager->getUser('user1');
 
     expect($user)->not->toBeNull()
         ->and($user['name'])->toBe('user1');
 });
 
 it('returns null when hotspot user not found', function () {
-    $client  = makeHotspotClient(['/ip/hotspot/user/print' => []]);
+    $client = makeHotspotClient(['/ip/hotspot/user/print' => []]);
     $manager = new HotspotManager($client);
 
     expect($manager->getUser('nonexistent'))->toBeNull();
@@ -81,7 +88,7 @@ it('returns active hotspot hosts', function () {
     ]);
 
     $manager = new HotspotManager($client);
-    $hosts   = $manager->getActiveHosts();
+    $hosts = $manager->getActiveHosts();
 
     expect($hosts)->toHaveCount(2)
         ->and($hosts[0]['user'])->toBe('user1')
@@ -89,7 +96,7 @@ it('returns active hotspot hosts', function () {
 });
 
 it('returns empty array when no active hosts', function () {
-    $client  = makeHotspotClient(['/ip/hotspot/active/print' => []]);
+    $client = makeHotspotClient(['/ip/hotspot/active/print' => []]);
     $manager = new HotspotManager($client);
 
     expect($manager->getActiveHosts())->toBeEmpty();
@@ -105,7 +112,7 @@ it('returns hotspot profiles', function () {
         ],
     ]);
 
-    $manager  = new HotspotManager($client);
+    $manager = new HotspotManager($client);
     $profiles = $manager->getProfiles();
 
     expect($profiles)->toHaveCount(2)
@@ -116,20 +123,20 @@ it('returns hotspot profiles', function () {
 // ─── createUser ───────────────────────────────────────────────
 
 it('creates hotspot user without throwing', function () {
-    $client  = makeHotspotClient();
+    $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->createUser([
-        'name'     => 'newuser',
+        'name' => 'newuser',
         'password' => 'pass123',
-        'profile'  => 'default',
+        'profile' => 'default',
     ]))->not->toThrow(\Exception::class);
 });
 
 // ─── deleteUser ───────────────────────────────────────────────
 
 it('deletes hotspot user without throwing', function () {
-    $client  = makeHotspotClient();
+    $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->deleteUser('user1'))
@@ -139,7 +146,7 @@ it('deletes hotspot user without throwing', function () {
 // ─── kickHost ─────────────────────────────────────────────────
 
 it('kicks active hotspot host without throwing', function () {
-    $client  = makeHotspotClient();
+    $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->kickHost('user1'))
@@ -149,16 +156,16 @@ it('kicks active hotspot host without throwing', function () {
 // ─── generateVouchers ─────────────────────────────────────────
 
 it('generates correct number of vouchers', function () {
-    $client   = makeHotspotClient();
-    $manager  = new HotspotManager($client);
+    $client = makeHotspotClient();
+    $manager = new HotspotManager($client);
     $vouchers = $manager->generateVouchers(5);
 
     expect($vouchers)->toHaveCount(5);
 });
 
 it('generates vouchers with unique names', function () {
-    $client   = makeHotspotClient();
-    $manager  = new HotspotManager($client);
+    $client = makeHotspotClient();
+    $manager = new HotspotManager($client);
     $vouchers = $manager->generateVouchers(10);
 
     $names = array_column($vouchers, 'name');
@@ -166,8 +173,8 @@ it('generates vouchers with unique names', function () {
 });
 
 it('generates vouchers with correct prefix', function () {
-    $client   = makeHotspotClient();
-    $manager  = new HotspotManager($client);
+    $client = makeHotspotClient();
+    $manager = new HotspotManager($client);
     $vouchers = $manager->generateVouchers(3, prefix: 'VIP');
 
     foreach ($vouchers as $voucher) {
@@ -178,7 +185,7 @@ it('generates vouchers with correct prefix', function () {
 // ─── enableUser / disableUser ─────────────────────────────────
 
 it('enables hotspot user without throwing', function () {
-    $client  = makeHotspotClient();
+    $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->enableUser('user1'))
@@ -186,7 +193,7 @@ it('enables hotspot user without throwing', function () {
 });
 
 it('disables hotspot user without throwing', function () {
-    $client  = makeHotspotClient();
+    $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->disableUser('user1'))

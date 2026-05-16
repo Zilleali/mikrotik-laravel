@@ -24,7 +24,8 @@ use Throwable;
  */
 class RouterUnreachable
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * @param string         $host      Router IP or hostname
@@ -36,10 +37,11 @@ class RouterUnreachable
      */
     public function __construct(
         public readonly string     $host,
-        public readonly int        $port      = 8728,
-        public readonly string     $router    = 'default',
-        public readonly int        $attempts  = 1,
-        public readonly string     $error     = '',
+        public readonly int        $port = 8728,
+        public readonly string     $router = 'default',
+        public readonly int        $attempts = 1,
+        public readonly string     $error = '',
         public readonly ?Throwable $exception = null,
-    ) {}
+    ) {
+    }
 }

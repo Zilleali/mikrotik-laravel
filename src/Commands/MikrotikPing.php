@@ -3,8 +3,6 @@
 namespace ZillEAli\MikrotikLaravel\Commands;
 
 use Illuminate\Console\Command;
-use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
-use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
 
 /**
  * MikrotikPing
@@ -42,7 +40,7 @@ class MikrotikPing extends Command
      */
     public function handle(): int
     {
-        $config  = config('mikrotik', []);
+        $config = config('mikrotik', []);
         $timeout = (int) $this->option('timeout');
 
         // Ping all routers
@@ -52,10 +50,11 @@ class MikrotikPing extends Command
 
         // Ping specific or default router
         $routerName = $this->argument('router') ?? 'default';
-        $routerCfg  = $this->resolveRouterConfig($config, $routerName);
+        $routerCfg = $this->resolveRouterConfig($config, $routerName);
 
         if (! $routerCfg) {
             $this->error("Router '{$routerName}' not found in config/mikrotik.php");
+
             return self::FAILURE;
         }
 
@@ -72,7 +71,7 @@ class MikrotikPing extends Command
     protected function pingAll(array $config, int $timeout): int
     {
         $routers = ['default' => $config] + ($config['routers'] ?? []);
-        $allOk   = true;
+        $allOk = true;
 
         $this->info('Pinging all configured routers...');
         $this->newLine();
@@ -110,9 +109,9 @@ class MikrotikPing extends Command
             $port,
         ), null, 'v');
 
-        $start  = microtime(true);
+        $start = microtime(true);
         $socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
-        $ms     = round((microtime(true) - $start) * 1000);
+        $ms = round((microtime(true) - $start) * 1000);
 
         if ($socket) {
             fclose($socket);
@@ -123,6 +122,7 @@ class MikrotikPing extends Command
                 $port,
                 $ms,
             ));
+
             return self::SUCCESS;
         }
 

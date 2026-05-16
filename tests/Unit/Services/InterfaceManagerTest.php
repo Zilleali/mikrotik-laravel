@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 
 function makeInterfaceClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -29,7 +36,7 @@ it('returns all interfaces', function () {
         ],
     ]);
 
-    $manager    = new InterfaceManager($client);
+    $manager = new InterfaceManager($client);
     $interfaces = $manager->getInterfaces();
 
     expect($interfaces)->toHaveCount(3)
@@ -38,7 +45,7 @@ it('returns all interfaces', function () {
 });
 
 it('returns empty array when no interfaces', function () {
-    $client  = makeInterfaceClient(['/interface/print' => []]);
+    $client = makeInterfaceClient(['/interface/print' => []]);
     $manager = new InterfaceManager($client);
 
     expect($manager->getInterfaces())->toBeEmpty();
@@ -53,7 +60,7 @@ it('returns single interface by name', function () {
         ],
     ]);
 
-    $manager   = new InterfaceManager($client);
+    $manager = new InterfaceManager($client);
     $interface = $manager->getInterface('ether1');
 
     expect($interface)->not->toBeNull()
@@ -62,7 +69,7 @@ it('returns single interface by name', function () {
 });
 
 it('returns null when interface not found', function () {
-    $client  = makeInterfaceClient(['/interface/print' => []]);
+    $client = makeInterfaceClient(['/interface/print' => []]);
     $manager = new InterfaceManager($client);
 
     expect($manager->getInterface('ether99'))->toBeNull();
@@ -79,8 +86,8 @@ it('returns only running interfaces', function () {
         ],
     ]);
 
-    $manager  = new InterfaceManager($client);
-    $running  = $manager->getRunningInterfaces();
+    $manager = new InterfaceManager($client);
+    $running = $manager->getRunningInterfaces();
 
     expect($running)->toHaveCount(2)
         ->and($running[0]['name'])->toBe('ether1')
@@ -95,7 +102,7 @@ it('returns only disabled interfaces', function () {
         ],
     ]);
 
-    $manager  = new InterfaceManager($client);
+    $manager = new InterfaceManager($client);
     $disabled = $manager->getDisabledInterfaces();
 
     expect($disabled)->toHaveCount(1)
@@ -105,7 +112,7 @@ it('returns only disabled interfaces', function () {
 // ─── enable / disable ─────────────────────────────────────────
 
 it('enables interface without throwing', function () {
-    $client  = makeInterfaceClient();
+    $client = makeInterfaceClient();
     $manager = new InterfaceManager($client);
 
     expect(fn () => $manager->enableInterface('ether1'))
@@ -113,7 +120,7 @@ it('enables interface without throwing', function () {
 });
 
 it('disables interface without throwing', function () {
-    $client  = makeInterfaceClient();
+    $client = makeInterfaceClient();
     $manager = new InterfaceManager($client);
 
     expect(fn () => $manager->disableInterface('ether1'))
@@ -138,7 +145,7 @@ it('returns traffic stats for interface', function () {
 });
 
 it('returns empty array when traffic unavailable', function () {
-    $client  = makeInterfaceClient(['/interface/monitor-traffic' => []]);
+    $client = makeInterfaceClient(['/interface/monitor-traffic' => []]);
     $manager = new InterfaceManager($client);
 
     expect($manager->getTraffic('ether1'))->toBeEmpty();
@@ -155,7 +162,7 @@ it('returns vlan interfaces', function () {
     ]);
 
     $manager = new InterfaceManager($client);
-    $vlans   = $manager->getVlans();
+    $vlans = $manager->getVlans();
 
     expect($vlans)->toHaveCount(2)
         ->and($vlans[0]['vlan-id'])->toBe('10');
@@ -172,7 +179,7 @@ it('filters ethernet interfaces only', function () {
         ],
     ]);
 
-    $manager  = new InterfaceManager($client);
+    $manager = new InterfaceManager($client);
     $ethernet = $manager->getEthernetInterfaces();
 
     expect($ethernet)->toHaveCount(2)

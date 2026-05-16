@@ -27,17 +27,18 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RadiusManager
 {
-    private const CMD_PRINT    = '/radius/print';
-    private const CMD_ADD      = '/radius/add';
-    private const CMD_SET      = '/radius/set';
-    private const CMD_REMOVE   = '/radius/remove';
-    private const CMD_ENABLE   = '/radius/enable';
-    private const CMD_DISABLE  = '/radius/disable';
+    private const CMD_PRINT = '/radius/print';
+    private const CMD_ADD = '/radius/add';
+    private const CMD_SET = '/radius/set';
+    private const CMD_REMOVE = '/radius/remove';
+    private const CMD_ENABLE = '/radius/enable';
+    private const CMD_DISABLE = '/radius/disable';
     private const CMD_INCOMING = '/radius/incoming/print';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Servers

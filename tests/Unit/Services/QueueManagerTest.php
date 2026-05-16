@@ -7,8 +7,9 @@ use ZillEAli\MikrotikLaravel\Services\QueueManager;
 
 function makeQueueClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
 
@@ -17,8 +18,14 @@ function makeQueueClient(array $responses = []): RouterosClient
             return $this->responses[$command] ?? [];
         }
 
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -33,7 +40,7 @@ it('returns all simple queues', function () {
     ]);
 
     $manager = new QueueManager($client);
-    $queues  = $manager->getSimpleQueues();
+    $queues = $manager->getSimpleQueues();
 
     expect($queues)->toHaveCount(2)
         ->and($queues[0]['name'])->toBe('ali-home')
@@ -41,7 +48,7 @@ it('returns all simple queues', function () {
 });
 
 it('returns empty array when no queues exist', function () {
-    $client  = makeQueueClient(['/queue/simple/print' => []]);
+    $client = makeQueueClient(['/queue/simple/print' => []]);
     $manager = new QueueManager($client);
 
     expect($manager->getSimpleQueues())->toBeEmpty();
@@ -57,7 +64,7 @@ it('returns single queue by name', function () {
     ]);
 
     $manager = new QueueManager($client);
-    $queue   = $manager->getSimpleQueue('ali-home');
+    $queue = $manager->getSimpleQueue('ali-home');
 
     expect($queue)->not->toBeNull()
         ->and($queue['name'])->toBe('ali-home')
@@ -65,7 +72,7 @@ it('returns single queue by name', function () {
 });
 
 it('returns null when queue not found', function () {
-    $client  = makeQueueClient(['/queue/simple/print' => []]);
+    $client = makeQueueClient(['/queue/simple/print' => []]);
     $manager = new QueueManager($client);
 
     expect($manager->getSimpleQueue('nonexistent'))->toBeNull();
@@ -74,12 +81,12 @@ it('returns null when queue not found', function () {
 // ─── createSimpleQueue ────────────────────────────────────────
 
 it('creates simple queue without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->createSimpleQueue([
-        'name'      => 'new-user',
-        'target'    => '10.0.0.100/32',
+        'name' => 'new-user',
+        'target' => '10.0.0.100/32',
         'max-limit' => '10M/10M',
     ]))->not->toThrow(\Exception::class);
 });
@@ -87,7 +94,7 @@ it('creates simple queue without throwing', function () {
 // ─── updateQueue ──────────────────────────────────────────────
 
 it('updates queue without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->updateQueue('ali-home', ['max-limit' => '20M/20M']))
@@ -97,7 +104,7 @@ it('updates queue without throwing', function () {
 // ─── deleteQueue ──────────────────────────────────────────────
 
 it('deletes queue without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->deleteQueue('ali-home'))
@@ -107,7 +114,7 @@ it('deletes queue without throwing', function () {
 // ─── setLimit ─────────────────────────────────────────────────
 
 it('sets bandwidth limit without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->setLimit('ali-home', '10M', '10M'))
@@ -117,7 +124,7 @@ it('sets bandwidth limit without throwing', function () {
 // ─── bulkSetLimit ─────────────────────────────────────────────
 
 it('bulk sets limit for multiple queues', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     $users = [
@@ -132,7 +139,7 @@ it('bulk sets limit for multiple queues', function () {
 // ─── enableQueue / disableQueue ───────────────────────────────
 
 it('enables queue without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->enableQueue('ali-home'))
@@ -140,7 +147,7 @@ it('enables queue without throwing', function () {
 });
 
 it('disables queue without throwing', function () {
-    $client  = makeQueueClient();
+    $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->disableQueue('ali-home'))
@@ -157,7 +164,7 @@ it('returns tree queues', function () {
     ]);
 
     $manager = new QueueManager($client);
-    $queues  = $manager->getTreeQueues();
+    $queues = $manager->getTreeQueues();
 
     expect($queues)->toHaveCount(1)
         ->and($queues[0]['name'])->toBe('parent-queue');

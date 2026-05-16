@@ -2,27 +2,26 @@
 
 namespace ZillEAli\MikrotikLaravel;
 
-use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
-use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
-use ZillEAli\MikrotikLaravel\Services\FirewallManager;
-use ZillEAli\MikrotikLaravel\Services\HotspotManager;
-use ZillEAli\MikrotikLaravel\Services\PppoeManager;
-use ZillEAli\MikrotikLaravel\Services\QueueManager;
-use ZillEAli\MikrotikLaravel\Services\SystemManager;
-use ZillEAli\MikrotikLaravel\Services\DhcpManager;
-use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
-use ZillEAli\MikrotikLaravel\Services\WirelessManager;
-use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
-use ZillEAli\MikrotikLaravel\Services\RadiusManager;
-use ZillEAli\MikrotikLaravel\Support\CachingProxy;
 use Illuminate\Support\Facades\Event;
+use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Events\RouterConnected;
 use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
+use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
+use ZillEAli\MikrotikLaravel\Services\DhcpManager;
+use ZillEAli\MikrotikLaravel\Services\FirewallManager;
+use ZillEAli\MikrotikLaravel\Services\HotspotManager;
+use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
+use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
+use ZillEAli\MikrotikLaravel\Services\PppoeManager;
+use ZillEAli\MikrotikLaravel\Services\QueueManager;
+use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // VPN Manager for WireGuard and OpenVPN support
-
+use ZillEAli\MikrotikLaravel\Services\SystemManager;
+use ZillEAli\MikrotikLaravel\Services\VpnManager;
+use ZillEAli\MikrotikLaravel\Services\WirelessManager;
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // VPN Manager for WireGuard and OpenVPN support
 
 /**
  * MikrotikManager
@@ -206,7 +205,7 @@ class MikrotikManager
             ];
         }
 
-        if (!isset($this->config['routers'][$name])) {
+        if (! isset($this->config['routers'][$name])) {
             throw new ConnectionException(
                 "Router '{$name}' not found in config/mikrotik.php routers array."
             );
@@ -303,6 +302,7 @@ class MikrotikManager
     {
         $name = $this->currentRouter;
         $this->currentRouter = 'default';
+
         return $name;
     }
 

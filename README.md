@@ -45,6 +45,23 @@
 - **RouterOS v6 + v7** — supports both plain and MD5 challenge-response login
 - **Filament v3 Widgets** — drop-in dashboard widgets _(coming in v0.3.0)_
 
+## Available Managers
+
+| Manager | Facade Method | Description |
+|---|---|---|
+| PppoeManager | `MikroTik::pppoe()` | PPPoE secrets, profiles, sessions |
+| HotspotManager | `MikroTik::hotspot()` | Hotspot users, vouchers, active hosts |
+| QueueManager | `MikroTik::queue()` | Simple/tree queues, bulk limits |
+| FirewallManager | `MikroTik::firewall()` | Filter, NAT, mangle, address lists |
+| SystemManager | `MikroTik::system()` | Resources, health, logs, ping |
+| InterfaceManager | `MikroTik::interfaces()` | Interfaces, traffic, VLANs |
+| DhcpManager | `MikroTik::dhcp()` | Leases, servers |
+| WirelessManager | `MikroTik::wireless()` | Registration table, access list |
+| IpPoolManager | `MikroTik::ipPool()` | IP pools, used addresses |
+| RadiusManager | `MikroTik::radius()` | RADIUS servers, incoming CoA |
+| RouterUserManager | `MikroTik::routerUsers()` | Router users, groups, sessions |
+| VpnManager | `MikroTik::vpn()` | WireGuard, L2TP, PPTP |
+
 ---
 
 ## Requirements
@@ -599,6 +616,7 @@ The package uses **mock RouterOS clients** for all tests — no real router requ
 ## Changelog
 
 ### v0.1.0 — Initial Release
+
 - `RouterosClient` — TCP socket, length encoding, login (v6 + v7)
 - `PppoeManager` — secrets, profiles, sessions, bulk ops
 - `HotspotManager` — users, profiles, active hosts, vouchers

@@ -59,7 +59,8 @@ class CachingProxy
     public function __construct(
         protected object $manager,
         protected int    $ttl = 30
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Magic Proxy
@@ -80,6 +81,7 @@ class CachingProxy
         if ($this->isWriteMethod($method)) {
             $result = $this->manager->$method(...$arguments);
             $this->flush(); // invalidate all cached reads after write
+
             return $result;
         }
 
@@ -94,7 +96,7 @@ class CachingProxy
         $result = $this->manager->$method(...$arguments);
 
         $this->cache[$cacheKey] = [
-            'data'       => $result,
+            'data' => $result,
             'expires_at' => time() + $this->ttl,
         ];
 
@@ -193,6 +195,7 @@ class CachingProxy
 
         if (time() > $this->cache[$key]['expires_at']) {
             unset($this->cache[$key]);
+
             return false;
         }
 

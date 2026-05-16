@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 
 function makeRouterUserClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -30,7 +37,7 @@ it('returns all router users', function () {
     ]);
 
     $manager = new RouterUserManager($client);
-    $users   = $manager->getUsers();
+    $users = $manager->getUsers();
 
     expect($users)->toHaveCount(3)
         ->and($users[0]['name'])->toBe('admin')
@@ -38,7 +45,7 @@ it('returns all router users', function () {
 });
 
 it('returns empty array when no users', function () {
-    $client  = makeRouterUserClient(['/user/print' => []]);
+    $client = makeRouterUserClient(['/user/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect($manager->getUsers())->toBeEmpty();
@@ -54,7 +61,7 @@ it('returns single user by name', function () {
     ]);
 
     $manager = new RouterUserManager($client);
-    $user    = $manager->getUser('noc');
+    $user = $manager->getUser('noc');
 
     expect($user)->not->toBeNull()
         ->and($user['name'])->toBe('noc')
@@ -62,7 +69,7 @@ it('returns single user by name', function () {
 });
 
 it('returns null when user not found', function () {
-    $client  = makeRouterUserClient(['/user/print' => []]);
+    $client = makeRouterUserClient(['/user/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect($manager->getUser('ghost'))->toBeNull();
@@ -80,7 +87,7 @@ it('returns all user groups', function () {
     ]);
 
     $manager = new RouterUserManager($client);
-    $groups  = $manager->getGroups();
+    $groups = $manager->getGroups();
 
     expect($groups)->toHaveCount(3)
         ->and($groups[0]['name'])->toBe('full')
@@ -90,14 +97,14 @@ it('returns all user groups', function () {
 // ─── addUser ──────────────────────────────────────────────────
 
 it('adds router user without throwing', function () {
-    $client  = makeRouterUserClient();
+    $client = makeRouterUserClient();
     $manager = new RouterUserManager($client);
 
     expect(fn () => $manager->addUser([
-        'name'     => 'noc-user',
+        'name' => 'noc-user',
         'password' => 'SecurePass123',
-        'group'    => 'read',
-        'comment'  => 'NOC read-only user',
+        'group' => 'read',
+        'comment' => 'NOC read-only user',
     ]))->not->toThrow(\Exception::class);
 });
 
@@ -117,7 +124,7 @@ it('deletes router user without throwing', function () {
 });
 
 it('does not throw when deleting non-existent user', function () {
-    $client  = makeRouterUserClient(['/user/print' => []]);
+    $client = makeRouterUserClient(['/user/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect(fn () => $manager->deleteUser('ghost'))
@@ -177,7 +184,7 @@ it('returns active user sessions (winbox/ssh/api)', function () {
         ],
     ]);
 
-    $manager  = new RouterUserManager($client);
+    $manager = new RouterUserManager($client);
     $sessions = $manager->getActiveSessions();
 
     expect($sessions)->toHaveCount(2)
@@ -200,7 +207,7 @@ it('returns true when user has active session', function () {
 });
 
 it('returns false when user has no active session', function () {
-    $client  = makeRouterUserClient(['/user/active/print' => []]);
+    $client = makeRouterUserClient(['/user/active/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect($manager->isUserActive('admin'))->toBeFalse();

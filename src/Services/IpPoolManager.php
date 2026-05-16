@@ -22,14 +22,15 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class IpPoolManager
 {
-    private const CMD_POOL_PRINT   = '/ip/pool/print';
-    private const CMD_POOL_ADD     = '/ip/pool/add';
-    private const CMD_POOL_REMOVE  = '/ip/pool/remove';
-    private const CMD_USED_PRINT   = '/ip/pool/used/print';
+    private const CMD_POOL_PRINT = '/ip/pool/print';
+    private const CMD_POOL_ADD = '/ip/pool/add';
+    private const CMD_POOL_REMOVE = '/ip/pool/remove';
+    private const CMD_USED_PRINT = '/ip/pool/used/print';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Pools

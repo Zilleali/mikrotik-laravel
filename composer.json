@@ -57,5 +57,12 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+    "test": "./vendor/bin/pest --no-coverage",
+    "test:coverage": "./vendor/bin/pest --coverage",
+    "lint": "./vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "lint:fix": "./vendor/bin/php-cs-fixer fix",
+    "analyse": "./vendor/bin/phpstan analyse src --level=5"
+}
 }

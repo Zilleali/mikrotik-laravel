@@ -22,7 +22,8 @@ use Illuminate\Queue\SerializesModels;
  */
 class SessionDisconnected
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * @param string      $username  PPPoE/Hotspot username
@@ -35,11 +36,12 @@ class SessionDisconnected
      */
     public function __construct(
         public readonly string  $username,
-        public readonly string  $router   = 'default',
-        public readonly string  $service  = 'pppoe',
-        public readonly ?string $ip       = null,
-        public readonly ?string $uptime   = null,
-        public readonly string  $reason   = 'manual',
-        public readonly array   $raw      = [],
-    ) {}
+        public readonly string  $router = 'default',
+        public readonly string  $service = 'pppoe',
+        public readonly ?string $ip = null,
+        public readonly ?string $uptime = null,
+        public readonly string  $reason = 'manual',
+        public readonly array   $raw = [],
+    ) {
+    }
 }

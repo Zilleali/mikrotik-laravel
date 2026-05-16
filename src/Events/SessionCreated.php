@@ -28,7 +28,8 @@ use Illuminate\Queue\SerializesModels;
  */
 class SessionCreated
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * @param string      $username   PPPoE/Hotspot username
@@ -41,9 +42,10 @@ class SessionCreated
     public function __construct(
         public readonly string  $username,
         public readonly string  $ip,
-        public readonly string  $router     = 'default',
-        public readonly string  $service    = 'pppoe',
+        public readonly string  $router = 'default',
+        public readonly string  $service = 'pppoe',
         public readonly ?string $macAddress = null,
-        public readonly array   $raw        = [],
-    ) {}
+        public readonly array   $raw = [],
+    ) {
+    }
 }

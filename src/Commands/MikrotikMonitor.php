@@ -50,8 +50,8 @@ class MikrotikMonitor extends Command
     public function handle(): int
     {
         $routerName = $this->option('router');
-        $interval   = max(1, (int) $this->option('interval'));
-        $once       = $this->option('once');
+        $interval = max(1, (int) $this->option('interval'));
+        $once = $this->option('once');
 
         $this->showHeader($routerName);
 
@@ -88,9 +88,9 @@ class MikrotikMonitor extends Command
             }
 
             $resources = $manager->system()->getResources();
-            $identity  = $manager->system()->getIdentity();
-            $sessions  = $manager->pppoe()->getActiveSessions();
-            $hosts     = $manager->hotspot()->getActiveHosts();
+            $identity = $manager->system()->getIdentity();
+            $sessions = $manager->pppoe()->getActiveSessions();
+            $hosts = $manager->hotspot()->getActiveHosts();
 
             $this->displayStats(
                 routerName: $routerName,
@@ -134,17 +134,17 @@ class MikrotikMonitor extends Command
         int    $sessions,
         int    $hosts,
     ): void {
-        $cpu    = $resources['cpu-load']    ?? '?';
-        $uptime = $resources['uptime']      ?? '?';
-        $mem    = $resources['free-memory'] ?? 0;
-        $total  = $resources['total-memory'] ?? 1;
+        $cpu = $resources['cpu-load'] ?? '?';
+        $uptime = $resources['uptime'] ?? '?';
+        $mem = $resources['free-memory'] ?? 0;
+        $total = $resources['total-memory'] ?? 1;
         $memPct = $total > 0 ? round((1 - $mem / $total) * 100) : 0;
-        $time   = now()->format('H:i:s');
+        $time = now()->format('H:i:s');
 
         $cpuColor = match(true) {
             $cpu > 80 => 'red',
             $cpu > 50 => 'yellow',
-            default   => 'green',
+            default => 'green',
         };
 
         $this->line(sprintf(
