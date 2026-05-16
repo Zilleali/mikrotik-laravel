@@ -20,6 +20,7 @@ use ZillEAli\MikrotikLaravel\Events\RouterConnected;
 use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
+use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 
 /**
  * MikrotikManager
@@ -369,5 +370,67 @@ class MikrotikManager
     public function withCache(object $manager, int $ttl = 30): CachingProxy
     {
         return new CachingProxy($manager, $ttl);
+    }
+
+    /**
+     * Get Router User manager for the current router.
+     *
+     * Manages Winbox/SSH/API users — NOT PPPoE/Hotspot users.
+     *
+     * @return RouterUserManager
+     */
+    public function routerUsers(): RouterUserManager
+    {
+        return new RouterUserManager($this->getClient());
+    }
+
+    /**
+     * Dispatch SessionCreated event.
+     * Call this from your app after a new PPPoE user connects.
+     *
+     * @param  string      $username
+     * @param  string      $ip
+     * @param  string      $service  'pppoe' or 'hotspot'
+     * @param  string|null $mac
+     * @return void
+     */
+    public function dispatchSessionCreated(
+        string $username,
+        string $ip,
+        string $service = 'pppoe',
+        ?string $mac = null,
+    ): void {
+        Event::dispatch(new SessionCreated(
+            username: $username,
+            ip: $ip,
+            router: $this->currentRouter,
+            service: $service,
+            macAddress: $mac,
+        ));
+    }
+
+    /**
+     * Dispatch SessionDisconnected event.
+     * Call this from your app after a PPPoE session ends.
+     *
+     * @param  string      $username
+     * @param  string|null $ip
+     * @param  string|null $uptime
+     * @param  string      $reason
+     * @return void
+     */
+    public function dispatchSessionDisconnected(
+        string $username,
+        ?string $ip = null,
+        ?string $uptime = null,
+        string $reason = 'manual',
+    ): void {
+        Event::dispatch(new SessionDisconnected(
+            username: $username,
+            router: $this->currentRouter,
+            ip: $ip,
+            uptime: $uptime,
+            reason: $reason,
+        ));
     }
 }
