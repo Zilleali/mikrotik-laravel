@@ -9,6 +9,9 @@ use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 use ZillEAli\MikrotikLaravel\Services\SystemManager;
+use ZillEAli\MikrotikLaravel\Services\DhcpManager;
+use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
+use ZillEAli\MikrotikLaravel\Services\WirelessManager;
 
 /**
  * MikrotikManager
@@ -271,5 +274,35 @@ class MikrotikManager
         $name = $this->currentRouter;
         $this->currentRouter = 'default';
         return $name;
+    }
+
+    /**
+     * Get Interface manager for the current router.
+     *
+     * @return InterfaceManager
+     */
+    public function interfaces(): InterfaceManager
+    {
+        return new InterfaceManager($this->getClient());
+    }
+
+    /**
+     * Get DHCP manager for the current router.
+     *
+     * @return DhcpManager
+     */
+    public function dhcp(): DhcpManager
+    {
+        return new DhcpManager($this->getClient());
+    }
+
+    /**
+     * Get Wireless manager for the current router.
+     *
+     * @return WirelessManager
+     */
+    public function wireless(): WirelessManager
+    {
+        return new WirelessManager($this->getClient());
     }
 }
