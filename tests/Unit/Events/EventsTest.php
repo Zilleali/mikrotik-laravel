@@ -9,12 +9,12 @@ use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 
 it('creates SessionCreated event with correct properties', function () {
     $event = new SessionCreated(
-        username:   'ali-home',
-        ip:         '10.0.0.45',
-        router:     'main',
-        service:    'pppoe',
+        username: 'ali-home',
+        ip: '10.0.0.45',
+        router: 'main',
+        service: 'pppoe',
         macAddress: null,
-        raw:        ['name' => 'ali-home', 'address' => '10.0.0.45'],
+        raw: ['name' => 'ali-home', 'address' => '10.0.0.45'],
     );
 
     expect($event->username)->toBe('ali-home')
@@ -38,11 +38,11 @@ it('creates SessionCreated with default values', function () {
 it('creates SessionDisconnected event with correct properties', function () {
     $event = new SessionDisconnected(
         username: 'ali-home',
-        router:   'main',
-        service:  'pppoe',
-        ip:       '10.0.0.45',
-        uptime:   '2h14m',
-        reason:   'manual',
+        router: 'main',
+        service: 'pppoe',
+        ip: '10.0.0.45',
+        uptime: '2h14m',
+        reason: 'manual',
     );
 
     expect($event->username)->toBe('ali-home')
@@ -67,11 +67,11 @@ it('creates RouterUnreachable event with correct properties', function () {
     $exception = new \RuntimeException('Connection refused');
 
     $event = new RouterUnreachable(
-        host:      '192.168.88.1',
-        port:      8728,
-        router:    'main',
-        attempts:  3,
-        error:     'Connection refused (111)',
+        host: '192.168.88.1',
+        port: 8728,
+        router: 'main',
+        attempts: 3,
+        error: 'Connection refused (111)',
         exception: $exception,
     );
 
@@ -96,8 +96,8 @@ it('creates RouterUnreachable with default values', function () {
 
 it('creates RouterConnected event with correct properties', function () {
     $event = new RouterConnected(
-        host:   '192.168.88.1',
-        port:   8728,
+        host: '192.168.88.1',
+        port: 8728,
         router: 'main',
     );
 
@@ -118,13 +118,27 @@ it('creates RouterConnected with default values', function () {
 it('SessionCreated properties are readonly', function () {
     $event = new SessionCreated(username: 'user1', ip: '10.0.0.1');
 
-    expect(fn () => $event->username = 'changed')
-        ->toThrow(\Error::class);
+    $threw = false;
+    try {
+        // @phpstan-ignore-next-line
+        $event->username = 'changed';
+    } catch (\Error $e) {
+        $threw = true;
+    }
+
+    expect($threw)->toBeTrue();
 });
 
 it('RouterUnreachable properties are readonly', function () {
     $event = new RouterUnreachable(host: '192.168.88.1');
 
-    expect(fn () => $event->host = 'changed')
-        ->toThrow(\Error::class);
+    $threw = false;
+    try {
+        // @phpstan-ignore-next-line
+        $event->host = 'changed';
+    } catch (\Error $e) {
+        $threw = true;
+    }
+
+    expect($threw)->toBeTrue();
 });
