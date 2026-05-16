@@ -24,15 +24,16 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class WirelessManager
 {
-    private const CMD_IFACE_PRINT       = '/interface/wireless/print';
-    private const CMD_REG_TABLE         = '/interface/wireless/registration-table/print';
-    private const CMD_ACCESS_LIST_PRINT  = '/interface/wireless/access-list/print';
-    private const CMD_ACCESS_LIST_ADD    = '/interface/wireless/access-list/add';
+    private const CMD_IFACE_PRINT = '/interface/wireless/print';
+    private const CMD_REG_TABLE = '/interface/wireless/registration-table/print';
+    private const CMD_ACCESS_LIST_PRINT = '/interface/wireless/access-list/print';
+    private const CMD_ACCESS_LIST_ADD = '/interface/wireless/access-list/add';
     private const CMD_ACCESS_LIST_REMOVE = '/interface/wireless/access-list/remove';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Wireless Interfaces

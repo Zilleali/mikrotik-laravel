@@ -15,4 +15,6 @@ use RuntimeException;
  * @author  Zill E Ali <zilleali1245@gmail.com>
  * @link    https://zilleali.com
  */
-class ConnectionException extends RuntimeException {}
+class ConnectionException extends RuntimeException
+{
+}

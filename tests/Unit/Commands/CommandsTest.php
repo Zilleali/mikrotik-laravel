@@ -1,8 +1,8 @@
 <?php
 
+use ZillEAli\MikrotikLaravel\Commands\MikrotikMonitor;
 use ZillEAli\MikrotikLaravel\Commands\MikrotikPing;
 use ZillEAli\MikrotikLaravel\Commands\MikrotikSync;
-use ZillEAli\MikrotikLaravel\Commands\MikrotikMonitor;
 
 // ─── Command class existence ──────────────────────────────────
 
@@ -24,7 +24,7 @@ it('MikrotikPing has correct signature', function () {
     $command = new MikrotikPing();
 
     $reflection = new ReflectionClass($command);
-    $signature  = $reflection->getProperty('signature');
+    $signature = $reflection->getProperty('signature');
     $signature->setAccessible(true);
 
     expect($signature->getValue($command))->toContain('mikrotik:ping');
@@ -34,7 +34,7 @@ it('MikrotikSync has correct signature', function () {
     $command = new MikrotikSync();
 
     $reflection = new ReflectionClass($command);
-    $signature  = $reflection->getProperty('signature');
+    $signature = $reflection->getProperty('signature');
     $signature->setAccessible(true);
 
     expect($signature->getValue($command))->toContain('mikrotik:sync');
@@ -44,7 +44,7 @@ it('MikrotikMonitor has correct signature', function () {
     $command = new MikrotikMonitor();
 
     $reflection = new ReflectionClass($command);
-    $signature  = $reflection->getProperty('signature');
+    $signature = $reflection->getProperty('signature');
     $signature->setAccessible(true);
 
     expect($signature->getValue($command))->toContain('mikrotik:monitor');
@@ -55,7 +55,7 @@ it('MikrotikMonitor has correct signature', function () {
 it('MikrotikPing has a description', function () {
     $command = new MikrotikPing();
 
-    $reflection  = new ReflectionClass($command);
+    $reflection = new ReflectionClass($command);
     $description = $reflection->getProperty('description');
     $description->setAccessible(true);
 
@@ -65,7 +65,7 @@ it('MikrotikPing has a description', function () {
 it('MikrotikSync has a description', function () {
     $command = new MikrotikSync();
 
-    $reflection  = new ReflectionClass($command);
+    $reflection = new ReflectionClass($command);
     $description = $reflection->getProperty('description');
     $description->setAccessible(true);
 
@@ -75,7 +75,7 @@ it('MikrotikSync has a description', function () {
 it('MikrotikMonitor has a description', function () {
     $command = new MikrotikMonitor();
 
-    $reflection  = new ReflectionClass($command);
+    $reflection = new ReflectionClass($command);
     $description = $reflection->getProperty('description');
     $description->setAccessible(true);
 

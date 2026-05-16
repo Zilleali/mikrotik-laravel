@@ -29,17 +29,18 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class VpnManager
 {
-    private const CMD_WG_IFACE_PRINT  = '/interface/wireguard/print';
-    private const CMD_WG_PEER_PRINT   = '/interface/wireguard/peers/print';
-    private const CMD_WG_PEER_ADD     = '/interface/wireguard/peers/add';
-    private const CMD_WG_PEER_REMOVE  = '/interface/wireguard/peers/remove';
-    private const CMD_L2TP_SESSION    = '/interface/l2tp-server/session/print';
-    private const CMD_PPTP_SESSION    = '/interface/pptp-server/session/print';
-    private const CMD_PPP_SECRET      = '/ppp/secret/print';
+    private const CMD_WG_IFACE_PRINT = '/interface/wireguard/print';
+    private const CMD_WG_PEER_PRINT = '/interface/wireguard/peers/print';
+    private const CMD_WG_PEER_ADD = '/interface/wireguard/peers/add';
+    private const CMD_WG_PEER_REMOVE = '/interface/wireguard/peers/remove';
+    private const CMD_L2TP_SESSION = '/interface/l2tp-server/session/print';
+    private const CMD_PPTP_SESSION = '/interface/pptp-server/session/print';
+    private const CMD_PPP_SECRET = '/ppp/secret/print';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // WireGuard

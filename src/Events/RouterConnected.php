@@ -21,7 +21,8 @@ use Illuminate\Queue\SerializesModels;
  */
 class RouterConnected
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     /**
      * @param string $host    Router IP or hostname
@@ -30,7 +31,8 @@ class RouterConnected
      */
     public function __construct(
         public readonly string $host,
-        public readonly int    $port   = 8728,
+        public readonly int    $port = 8728,
         public readonly string $router = 'default',
-    ) {}
+    ) {
+    }
 }

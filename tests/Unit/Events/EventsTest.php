@@ -119,6 +119,7 @@ it('SessionCreated properties are readonly', function () {
     $event = new SessionCreated(username: 'user1', ip: '10.0.0.1');
 
     $threw = false;
+
     try {
         // @phpstan-ignore-next-line
         $event->username = 'changed';
@@ -133,6 +134,7 @@ it('RouterUnreachable properties are readonly', function () {
     $event = new RouterUnreachable(host: '192.168.88.1');
 
     $threw = false;
+
     try {
         // @phpstan-ignore-next-line
         $event->host = 'changed';

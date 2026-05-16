@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\DhcpManager;
 
 function makeDhcpClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -29,7 +36,7 @@ it('returns all dhcp leases', function () {
     ]);
 
     $manager = new DhcpManager($client);
-    $leases  = $manager->getLeases();
+    $leases = $manager->getLeases();
 
     expect($leases)->toHaveCount(2)
         ->and($leases[0]['address'])->toBe('192.168.1.10')
@@ -37,7 +44,7 @@ it('returns all dhcp leases', function () {
 });
 
 it('returns empty array when no leases', function () {
-    $client  = makeDhcpClient(['/ip/dhcp-server/lease/print' => []]);
+    $client = makeDhcpClient(['/ip/dhcp-server/lease/print' => []]);
     $manager = new DhcpManager($client);
 
     expect($manager->getLeases())->toBeEmpty();
@@ -54,14 +61,14 @@ it('finds lease by mac address', function () {
     ]);
 
     $manager = new DhcpManager($client);
-    $lease   = $manager->getLeaseByMac('AA:BB:CC:DD:EE:01');
+    $lease = $manager->getLeaseByMac('AA:BB:CC:DD:EE:01');
 
     expect($lease)->not->toBeNull()
         ->and($lease['address'])->toBe('192.168.1.10');
 });
 
 it('returns null when mac not found', function () {
-    $client  = makeDhcpClient(['/ip/dhcp-server/lease/print' => []]);
+    $client = makeDhcpClient(['/ip/dhcp-server/lease/print' => []]);
     $manager = new DhcpManager($client);
 
     expect($manager->getLeaseByMac('FF:FF:FF:FF:FF:FF'))->toBeNull();
@@ -77,7 +84,7 @@ it('finds lease by ip address', function () {
     ]);
 
     $manager = new DhcpManager($client);
-    $lease   = $manager->getLeaseByIp('192.168.1.10');
+    $lease = $manager->getLeaseByIp('192.168.1.10');
 
     expect($lease)->not->toBeNull()
         ->and($lease['host-name'])->toBe('pc1');

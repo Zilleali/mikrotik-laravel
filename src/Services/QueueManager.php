@@ -25,21 +25,22 @@ class QueueManager
     /**
      * RouterOS API commands
      */
-    private const CMD_SIMPLE_PRINT   = '/queue/simple/print';
-    private const CMD_SIMPLE_ADD     = '/queue/simple/add';
-    private const CMD_SIMPLE_SET     = '/queue/simple/set';
-    private const CMD_SIMPLE_REMOVE  = '/queue/simple/remove';
-    private const CMD_SIMPLE_ENABLE  = '/queue/simple/enable';
+    private const CMD_SIMPLE_PRINT = '/queue/simple/print';
+    private const CMD_SIMPLE_ADD = '/queue/simple/add';
+    private const CMD_SIMPLE_SET = '/queue/simple/set';
+    private const CMD_SIMPLE_REMOVE = '/queue/simple/remove';
+    private const CMD_SIMPLE_ENABLE = '/queue/simple/enable';
     private const CMD_SIMPLE_DISABLE = '/queue/simple/disable';
-    private const CMD_TREE_PRINT     = '/queue/tree/print';
-    private const CMD_TREE_ADD       = '/queue/tree/add';
+    private const CMD_TREE_PRINT = '/queue/tree/print';
+    private const CMD_TREE_ADD = '/queue/tree/add';
 
     /**
      * @param RouterosClient $client Authenticated RouterOS client
      */
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Simple Queues

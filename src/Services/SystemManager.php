@@ -26,18 +26,19 @@ class SystemManager
      * RouterOS API commands
      */
     private const CMD_RESOURCE = '/system/resource/print';
-    private const CMD_HEALTH   = '/system/health/print';
+    private const CMD_HEALTH = '/system/health/print';
     private const CMD_IDENTITY = '/system/identity/print';
-    private const CMD_LOGS     = '/log/print';
-    private const CMD_REBOOT   = '/system/reboot';
-    private const CMD_PING     = '/ping';
+    private const CMD_LOGS = '/log/print';
+    private const CMD_REBOOT = '/system/reboot';
+    private const CMD_PING = '/ping';
 
     /**
      * @param RouterosClient $client Authenticated RouterOS client
      */
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Resources
@@ -233,7 +234,7 @@ class SystemManager
     {
         return $this->client->query(self::CMD_PING, [
             'address' => $address,
-            'count'   => (string) $count,
+            'count' => (string) $count,
         ]);
     }
 

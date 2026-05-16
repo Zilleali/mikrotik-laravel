@@ -7,8 +7,9 @@ use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 
 function mockClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
 
@@ -17,8 +18,14 @@ function mockClient(array $responses = []): RouterosClient
             return $this->responses[$command] ?? [];
         }
 
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -41,7 +48,7 @@ it('returns all pppoe secrets', function () {
 });
 
 it('returns empty array when no secrets exist', function () {
-    $client  = mockClient(['/ppp/secret/print' => []]);
+    $client = mockClient(['/ppp/secret/print' => []]);
     $manager = new PppoeManager($client);
 
     expect($manager->getSecrets())->toBeEmpty();
@@ -57,7 +64,7 @@ it('returns single secret by name', function () {
     ]);
 
     $manager = new PppoeManager($client);
-    $secret  = $manager->getSecret('ali-home');
+    $secret = $manager->getSecret('ali-home');
 
     expect($secret)->not->toBeNull()
         ->and($secret['name'])->toBe('ali-home')
@@ -65,7 +72,7 @@ it('returns single secret by name', function () {
 });
 
 it('returns null when secret not found', function () {
-    $client  = mockClient(['/ppp/secret/print' => []]);
+    $client = mockClient(['/ppp/secret/print' => []]);
     $manager = new PppoeManager($client);
 
     expect($manager->getSecret('nonexistent'))->toBeNull();
@@ -81,7 +88,7 @@ it('returns active pppoe sessions', function () {
         ],
     ]);
 
-    $manager  = new PppoeManager($client);
+    $manager = new PppoeManager($client);
     $sessions = $manager->getActiveSessions();
 
     expect($sessions)->toHaveCount(2)
@@ -106,7 +113,7 @@ it('finds active session by ip address', function () {
 });
 
 it('returns null when ip not found', function () {
-    $client  = mockClient(['/ppp/active/print' => []]);
+    $client = mockClient(['/ppp/active/print' => []]);
     $manager = new PppoeManager($client);
 
     expect($manager->getSecretByIp('10.0.0.99'))->toBeNull();
@@ -122,7 +129,7 @@ it('returns pppoe profiles', function () {
         ],
     ]);
 
-    $manager  = new PppoeManager($client);
+    $manager = new PppoeManager($client);
     $profiles = $manager->getProfiles();
 
     expect($profiles)->toHaveCount(2)
@@ -132,14 +139,14 @@ it('returns pppoe profiles', function () {
 // ─── enableSecret / disableSecret ─────────────────────────────
 
 it('enables a pppoe secret without throwing', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->enableSecret('ali-home'))->not->toThrow(\Exception::class);
 });
 
 it('disables a pppoe secret without throwing', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->disableSecret('ali-home'))->not->toThrow(\Exception::class);
@@ -148,7 +155,7 @@ it('disables a pppoe secret without throwing', function () {
 // ─── bulkEnable / bulkDisable ─────────────────────────────────
 
 it('bulk enables multiple secrets', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkEnable(['ali-home', 'zain-fiber']))
@@ -156,7 +163,7 @@ it('bulk enables multiple secrets', function () {
 });
 
 it('bulk disables multiple secrets', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkDisable(['ali-home', 'zain-fiber']))
@@ -166,7 +173,7 @@ it('bulk disables multiple secrets', function () {
 // ─── deleteSecret ─────────────────────────────────────────────
 
 it('deletes a pppoe secret without throwing', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->deleteSecret('ali-home'))
@@ -176,7 +183,7 @@ it('deletes a pppoe secret without throwing', function () {
 // ─── kickSession ──────────────────────────────────────────────
 
 it('kicks an active session without throwing', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->kickSession('ali-home'))
@@ -186,7 +193,7 @@ it('kicks an active session without throwing', function () {
 // ─── bulkKick ─────────────────────────────────────────────────
 
 it('bulk kicks multiple sessions', function () {
-    $client  = mockClient();
+    $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkKick(['ali-home', 'zain-fiber']))

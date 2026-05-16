@@ -73,7 +73,7 @@ class InterfaceManager
         $all = $this->getInterfaces();
 
         return array_values(
-            array_filter($all, fn($i) => ($i['running'] ?? 'false') === 'true')
+            array_filter($all, fn ($i) => ($i['running'] ?? 'false') === 'true')
         );
     }
 
@@ -87,7 +87,7 @@ class InterfaceManager
         $all = $this->getInterfaces();
 
         return array_values(
-            array_filter($all, fn($i) => ($i['disabled'] ?? 'false') === 'true')
+            array_filter($all, fn ($i) => ($i['disabled'] ?? 'false') === 'true')
         );
     }
 
@@ -101,7 +101,7 @@ class InterfaceManager
         $all = $this->getInterfaces();
 
         return array_values(
-            array_filter($all, fn($i) => ($i['type'] ?? '') === 'ether')
+            array_filter($all, fn ($i) => ($i['type'] ?? '') === 'ether')
         );
     }
 
@@ -153,7 +153,7 @@ class InterfaceManager
     {
         $interface = $this->getInterface($name);
 
-        if (!$interface) {
+        if (! $interface) {
             return;
         }
 
@@ -176,7 +176,7 @@ class InterfaceManager
     {
         $interface = $this->getInterface($name);
 
-        if (!$interface) {
+        if (! $interface) {
             return;
         }
 

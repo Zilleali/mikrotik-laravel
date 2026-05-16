@@ -105,7 +105,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (!$secret) {
+        if (! $secret) {
             return;
         }
 
@@ -125,7 +125,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (!$secret) {
+        if (! $secret) {
             return;
         }
 
@@ -145,7 +145,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (!$secret) {
+        if (! $secret) {
             return;
         }
 
@@ -165,7 +165,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (!$secret) {
+        if (! $secret) {
             return;
         }
 

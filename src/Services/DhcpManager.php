@@ -21,14 +21,15 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class DhcpManager
 {
-    private const CMD_LEASE_PRINT  = '/ip/dhcp-server/lease/print';
-    private const CMD_LEASE_SET    = '/ip/dhcp-server/lease/set';
+    private const CMD_LEASE_PRINT = '/ip/dhcp-server/lease/print';
+    private const CMD_LEASE_SET = '/ip/dhcp-server/lease/set';
     private const CMD_LEASE_REMOVE = '/ip/dhcp-server/lease/remove';
     private const CMD_SERVER_PRINT = '/ip/dhcp-server/print';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Leases

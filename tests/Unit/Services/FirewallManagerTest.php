@@ -7,8 +7,9 @@ use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 
 function makeFirewallClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
 
@@ -17,8 +18,14 @@ function makeFirewallClient(array $responses = []): RouterosClient
             return $this->responses[$command] ?? [];
         }
 
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -33,7 +40,7 @@ it('returns all firewall filter rules', function () {
     ]);
 
     $manager = new FirewallManager($client);
-    $rules   = $manager->getFilterRules();
+    $rules = $manager->getFilterRules();
 
     expect($rules)->toHaveCount(2)
         ->and($rules[0]['chain'])->toBe('input')
@@ -41,7 +48,7 @@ it('returns all firewall filter rules', function () {
 });
 
 it('returns empty array when no filter rules exist', function () {
-    $client  = makeFirewallClient(['/ip/firewall/filter/print' => []]);
+    $client = makeFirewallClient(['/ip/firewall/filter/print' => []]);
     $manager = new FirewallManager($client);
 
     expect($manager->getFilterRules())->toBeEmpty();
@@ -57,7 +64,7 @@ it('returns all NAT rules', function () {
     ]);
 
     $manager = new FirewallManager($client);
-    $rules   = $manager->getNatRules();
+    $rules = $manager->getNatRules();
 
     expect($rules)->toHaveCount(1)
         ->and($rules[0]['action'])->toBe('masquerade');
@@ -73,7 +80,7 @@ it('returns all mangle rules', function () {
     ]);
 
     $manager = new FirewallManager($client);
-    $rules   = $manager->getMangleRules();
+    $rules = $manager->getMangleRules();
 
     expect($rules)->toHaveCount(1)
         ->and($rules[0]['chain'])->toBe('prerouting');
@@ -90,7 +97,7 @@ it('returns all address lists', function () {
     ]);
 
     $manager = new FirewallManager($client);
-    $lists   = $manager->getAddressLists();
+    $lists = $manager->getAddressLists();
 
     expect($lists)->toHaveCount(2)
         ->and($lists[0]['list'])->toBe('blocked')
@@ -100,7 +107,7 @@ it('returns all address lists', function () {
 // ─── addToAddressList ─────────────────────────────────────────
 
 it('adds ip to address list without throwing', function () {
-    $client  = makeFirewallClient();
+    $client = makeFirewallClient();
     $manager = new FirewallManager($client);
 
     expect(fn () => $manager->addToAddressList('1.2.3.4', 'blocked'))
@@ -108,7 +115,7 @@ it('adds ip to address list without throwing', function () {
 });
 
 it('adds ip with comment to address list', function () {
-    $client  = makeFirewallClient();
+    $client = makeFirewallClient();
     $manager = new FirewallManager($client);
 
     expect(fn () => $manager->addToAddressList('1.2.3.4', 'blocked', 'spam IP'))
@@ -133,12 +140,12 @@ it('removes ip from address list without throwing', function () {
 // ─── addFilterRule ────────────────────────────────────────────
 
 it('adds firewall filter rule without throwing', function () {
-    $client  = makeFirewallClient();
+    $client = makeFirewallClient();
     $manager = new FirewallManager($client);
 
     expect(fn () => $manager->addFilterRule([
-        'chain'   => 'input',
-        'action'  => 'drop',
+        'chain' => 'input',
+        'action' => 'drop',
         'src-address' => '1.2.3.4',
     ]))->not->toThrow(\Exception::class);
 });
@@ -146,12 +153,12 @@ it('adds firewall filter rule without throwing', function () {
 // ─── addNatRule ───────────────────────────────────────────────
 
 it('adds NAT rule without throwing', function () {
-    $client  = makeFirewallClient();
+    $client = makeFirewallClient();
     $manager = new FirewallManager($client);
 
     expect(fn () => $manager->addNatRule([
-        'chain'         => 'srcnat',
-        'action'        => 'masquerade',
+        'chain' => 'srcnat',
+        'action' => 'masquerade',
         'out-interface' => 'ether1',
     ]))->not->toThrow(\Exception::class);
 });
@@ -159,11 +166,11 @@ it('adds NAT rule without throwing', function () {
 // ─── addMangleRule ────────────────────────────────────────────
 
 it('adds mangle rule without throwing', function () {
-    $client  = makeFirewallClient();
+    $client = makeFirewallClient();
     $manager = new FirewallManager($client);
 
     expect(fn () => $manager->addMangleRule([
-        'chain'  => 'prerouting',
+        'chain' => 'prerouting',
         'action' => 'mark-packet',
         'new-packet-mark' => 'isp1',
     ]))->not->toThrow(\Exception::class);
@@ -184,7 +191,7 @@ it('returns true when ip is in blocked list', function () {
 });
 
 it('returns false when ip is not in list', function () {
-    $client  = makeFirewallClient(['/ip/firewall/address-list/print' => []]);
+    $client = makeFirewallClient(['/ip/firewall/address-list/print' => []]);
     $manager = new FirewallManager($client);
 
     expect($manager->isIpInList('9.9.9.9', 'blocked'))->toBeFalse();

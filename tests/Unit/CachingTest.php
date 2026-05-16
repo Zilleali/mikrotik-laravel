@@ -20,17 +20,24 @@ class TrackableClient extends RouterosClient
     public function query(string $command, array $params = [], array $queries = []): array
     {
         $this->queryCount++;
+
         return $this->responses[$command] ?? [];
     }
 
-    public function send(array $words): array { return []; }
-    public function isConnected(): bool { return true; }
+    public function send(array $words): array
+    {
+        return [];
+    }
+    public function isConnected(): bool
+    {
+        return true;
+    }
 }
 
 // ─── CachingProxy wraps manager ───────────────────────────────
 
 it('returns same result as underlying manager', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home', 'service' => 'pppoe']],
     ]);
 
@@ -42,7 +49,7 @@ it('returns same result as underlying manager', function () {
 });
 
 it('does not call router again on cache hit', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home']],
     ]);
 
@@ -56,7 +63,7 @@ it('does not call router again on cache hit', function () {
 });
 
 it('calls router again after ttl expires', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home']],
     ]);
 
@@ -70,7 +77,7 @@ it('calls router again after ttl expires', function () {
 });
 
 it('calls router again after flush', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home']],
     ]);
 
@@ -84,7 +91,7 @@ it('calls router again after flush', function () {
 });
 
 it('does not cache createSecret calls', function () {
-    $client  = new TrackableClient();
+    $client = new TrackableClient();
     $manager = new CachingProxy(new PppoeManager($client), ttl: 60);
 
     $manager->createSecret(['name' => 'user1', 'password' => 'pass']);
@@ -94,7 +101,7 @@ it('does not cache createSecret calls', function () {
 });
 
 it('invalidates cache after write operation', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home']],
     ]);
 
@@ -108,7 +115,7 @@ it('invalidates cache after write operation', function () {
 });
 
 it('caches getSecrets and getActiveSessions separately', function () {
-    $client  = new TrackableClient([
+    $client = new TrackableClient([
         '/ppp/secret/print' => [['name' => 'ali-home']],
         '/ppp/active/print' => [['name' => 'ali-home', 'address' => '10.0.0.1']],
     ]);

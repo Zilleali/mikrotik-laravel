@@ -25,15 +25,15 @@ class FirewallManager
     /**
      * RouterOS API commands
      */
-    private const CMD_FILTER_PRINT  = '/ip/firewall/filter/print';
-    private const CMD_FILTER_ADD    = '/ip/firewall/filter/add';
+    private const CMD_FILTER_PRINT = '/ip/firewall/filter/print';
+    private const CMD_FILTER_ADD = '/ip/firewall/filter/add';
     private const CMD_FILTER_REMOVE = '/ip/firewall/filter/remove';
-    private const CMD_NAT_PRINT     = '/ip/firewall/nat/print';
-    private const CMD_NAT_ADD       = '/ip/firewall/nat/add';
-    private const CMD_MANGLE_PRINT  = '/ip/firewall/mangle/print';
-    private const CMD_MANGLE_ADD    = '/ip/firewall/mangle/add';
-    private const CMD_ADDRLIST_PRINT  = '/ip/firewall/address-list/print';
-    private const CMD_ADDRLIST_ADD    = '/ip/firewall/address-list/add';
+    private const CMD_NAT_PRINT = '/ip/firewall/nat/print';
+    private const CMD_NAT_ADD = '/ip/firewall/nat/add';
+    private const CMD_MANGLE_PRINT = '/ip/firewall/mangle/print';
+    private const CMD_MANGLE_ADD = '/ip/firewall/mangle/add';
+    private const CMD_ADDRLIST_PRINT = '/ip/firewall/address-list/print';
+    private const CMD_ADDRLIST_ADD = '/ip/firewall/address-list/add';
     private const CMD_ADDRLIST_REMOVE = '/ip/firewall/address-list/remove';
 
     /**
@@ -41,7 +41,8 @@ class FirewallManager
      */
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Filter Rules
@@ -191,7 +192,7 @@ class FirewallManager
     {
         $data = [
             'address' => $ip,
-            'list'    => $list,
+            'list' => $list,
         ];
 
         if ($comment !== null) {

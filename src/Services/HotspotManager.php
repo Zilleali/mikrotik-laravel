@@ -25,23 +25,24 @@ class HotspotManager
     /**
      * RouterOS API commands
      */
-    private const CMD_USER_PRINT   = '/ip/hotspot/user/print';
-    private const CMD_USER_ADD     = '/ip/hotspot/user/add';
-    private const CMD_USER_SET     = '/ip/hotspot/user/set';
-    private const CMD_USER_REMOVE  = '/ip/hotspot/user/remove';
-    private const CMD_USER_ENABLE  = '/ip/hotspot/user/enable';
+    private const CMD_USER_PRINT = '/ip/hotspot/user/print';
+    private const CMD_USER_ADD = '/ip/hotspot/user/add';
+    private const CMD_USER_SET = '/ip/hotspot/user/set';
+    private const CMD_USER_REMOVE = '/ip/hotspot/user/remove';
+    private const CMD_USER_ENABLE = '/ip/hotspot/user/enable';
     private const CMD_USER_DISABLE = '/ip/hotspot/user/disable';
-    private const CMD_ACTIVE_PRINT  = '/ip/hotspot/active/print';
+    private const CMD_ACTIVE_PRINT = '/ip/hotspot/active/print';
     private const CMD_ACTIVE_REMOVE = '/ip/hotspot/active/remove';
     private const CMD_PROFILE_PRINT = '/ip/hotspot/user/profile/print';
-    private const CMD_PROFILE_ADD   = '/ip/hotspot/user/profile/add';
+    private const CMD_PROFILE_ADD = '/ip/hotspot/user/profile/add';
 
     /**
      * @param RouterosClient $client Authenticated RouterOS client
      */
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Users
@@ -254,27 +255,27 @@ class HotspotManager
     public function generateVouchers(
         int    $count,
         string $profile = 'default',
-        string $prefix  = 'VC',
-        int    $length  = 6
+        string $prefix = 'VC',
+        int    $length = 6
     ): array {
         $vouchers = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $suffix   = strtoupper(substr(bin2hex(random_bytes($length)), 0, $length));
-            $name     = $prefix . $suffix;
+            $suffix = strtoupper(substr(bin2hex(random_bytes($length)), 0, $length));
+            $name = $prefix . $suffix;
             $password = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
 
             $this->createUser([
-                'name'     => $name,
+                'name' => $name,
                 'password' => $password,
-                'profile'  => $profile,
-                'comment'  => 'voucher',
+                'profile' => $profile,
+                'comment' => 'voucher',
             ]);
 
             $vouchers[] = [
-                'name'     => $name,
+                'name' => $name,
                 'password' => $password,
-                'profile'  => $profile,
+                'profile' => $profile,
             ];
         }
 

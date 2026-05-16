@@ -47,7 +47,7 @@ class MikrotikSync extends Command
     public function handle(): int
     {
         $config = config('mikrotik', []);
-        $ttl    = (int) $this->option('ttl');
+        $ttl = (int) $this->option('ttl');
 
         if ($this->option('all')) {
             return $this->syncAll($config, $ttl);
@@ -68,7 +68,7 @@ class MikrotikSync extends Command
     protected function syncAll(array $config, int $ttl): int
     {
         $routers = array_keys(['default' => true] + ($config['routers'] ?? []));
-        $allOk   = true;
+        $allOk = true;
 
         foreach ($routers as $name) {
             $result = $this->syncRouter($name, $ttl);
@@ -132,8 +132,8 @@ class MikrotikSync extends Command
 
             Log::info("MikroTik sync completed for [{$routerName}]", [
                 'pppoe_sessions' => count($sessions),
-                'hotspot_hosts'  => count($hosts),
-                'cpu_load'       => $resources['cpu-load'] ?? null,
+                'hotspot_hosts' => count($hosts),
+                'cpu_load' => $resources['cpu-load'] ?? null,
             ]);
 
             return self::SUCCESS;
@@ -143,6 +143,7 @@ class MikrotikSync extends Command
             Log::error("MikroTik sync failed for [{$routerName}]", [
                 'error' => $e->getMessage(),
             ]);
+
             return self::FAILURE;
         } catch (\Throwable $e) {
             $this->error("  ✗ [{$routerName}] Error: {$e->getMessage()}");
@@ -150,6 +151,7 @@ class MikrotikSync extends Command
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return self::FAILURE;
         }
     }

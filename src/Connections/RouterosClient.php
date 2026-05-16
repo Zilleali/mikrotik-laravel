@@ -58,11 +58,12 @@ class RouterosClient
      */
     public function __construct(
         protected string $host,
-        protected int    $port     = 8728,
+        protected int    $port = 8728,
         protected string $username = 'admin',
         protected string $password = '',
-        protected int    $timeout  = 10,
-    ) {}
+        protected int    $timeout = 10,
+    ) {
+    }
 
     // =========================================================
     // Connection Management
@@ -107,7 +108,7 @@ class RouterosClient
     {
         if ($this->socket) {
             fclose($this->socket);
-            $this->socket    = null;
+            $this->socket = null;
             $this->connected = false;
         }
     }
@@ -144,7 +145,7 @@ class RouterosClient
         // Respond with MD5(null_byte + password + challenge)
         if (isset($response[0]) && str_starts_with($response[0], '=ret=')) {
             $challenge = pack('H*', substr($response[0], 5));
-            $md5       = md5("\x00{$this->password}{$challenge}", true);
+            $md5 = md5("\x00{$this->password}{$challenge}", true);
 
             $response = $this->send([
                 '/login',
@@ -237,6 +238,7 @@ class RouterosClient
             // !trap = command error, !fatal = disconnect
             if (str_starts_with($word, '!trap') || str_starts_with($word, '!fatal')) {
                 $message = $this->readTrapMessage();
+
                 throw new ApiException("RouterOS error: {$message}");
             }
 
@@ -264,7 +266,7 @@ class RouterosClient
             return '';
         }
 
-        $word      = '';
+        $word = '';
         $remaining = $len;
 
         // Read in chunks — TCP may not deliver all bytes at once
@@ -277,7 +279,7 @@ class RouterosClient
                 );
             }
 
-            $word      .= $chunk;
+            $word .= $chunk;
             $remaining -= strlen($chunk);
         }
 
@@ -334,30 +336,33 @@ class RouterosClient
 
         if ($len < 0x4000) {
             $len |= 0x8000;
+
             return chr(($len >> 8) & 0xFF) . chr($len & 0xFF);
         }
 
         if ($len < 0x200000) {
             $len |= 0xC00000;
+
             return chr(($len >> 16) & 0xFF)
-                . chr(($len >> 8)   & 0xFF)
-                . chr($len          & 0xFF);
+                . chr(($len >> 8) & 0xFF)
+                . chr($len & 0xFF);
         }
 
         if ($len < 0x10000000) {
             $len |= 0xE0000000;
+
             return chr(($len >> 24) & 0xFF)
-                . chr(($len >> 16)  & 0xFF)
-                . chr(($len >> 8)   & 0xFF)
-                . chr($len          & 0xFF);
+                . chr(($len >> 16) & 0xFF)
+                . chr(($len >> 8) & 0xFF)
+                . chr($len & 0xFF);
         }
 
         // 5-byte encoding for very large words (rare in practice)
         return chr(0xF0)
             . chr(($len >> 24) & 0xFF)
             . chr(($len >> 16) & 0xFF)
-            . chr(($len >> 8)  & 0xFF)
-            . chr($len         & 0xFF);
+            . chr(($len >> 8) & 0xFF)
+            . chr($len & 0xFF);
     }
 
     /**
@@ -380,32 +385,36 @@ class RouterosClient
         // 2-byte: 10xxxxxx xxxxxxxx
         if ($firstByte < 0xC0) {
             $b2 = ord(fread($this->socket, 1));
+
             return (($firstByte & 0x3F) << 8) | $b2;
         }
 
         // 3-byte: 110xxxxx xxxxxxxx xxxxxxxx
         if ($firstByte < 0xE0) {
             $bytes = fread($this->socket, 2);
+
             return (($firstByte & 0x1F) << 16)
                 | (ord($bytes[0]) << 8)
-                |  ord($bytes[1]);
+                | ord($bytes[1]);
         }
 
         // 4-byte: 1110xxxx xxxxxxxx xxxxxxxx xxxxxxxx
         if ($firstByte < 0xF0) {
             $bytes = fread($this->socket, 3);
+
             return (($firstByte & 0x0F) << 24)
                 | (ord($bytes[0]) << 16)
                 | (ord($bytes[1]) << 8)
-                |  ord($bytes[2]);
+                | ord($bytes[2]);
         }
 
         // 5-byte: 11110000 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
         $bytes = fread($this->socket, 4);
+
         return (ord($bytes[0]) << 24)
             | (ord($bytes[1]) << 16)
             | (ord($bytes[2]) << 8)
-            |  ord($bytes[3]);
+            | ord($bytes[3]);
     }
 
     // =========================================================
@@ -444,23 +453,24 @@ class RouterosClient
             $words[] = "?{$query}";
         }
 
-        $raw    = $this->send($words);
+        $raw = $this->send($words);
         $result = [];
-        $row    = [];
+        $row = [];
 
         foreach ($raw as $word) {
             // New row starts — save previous row if exists
             if ($word === '!re') {
                 if (! empty($row)) {
                     $result[] = $row;
-                    $row      = [];
+                    $row = [];
                 }
+
                 continue;
             }
 
             // Parse =key=value words into associative array
             if (str_starts_with($word, '=')) {
-                $parts       = explode('=', substr($word, 1), 2);
+                $parts = explode('=', substr($word, 1), 2);
                 $row[$parts[0]] = $parts[1] ?? '';
             }
         }

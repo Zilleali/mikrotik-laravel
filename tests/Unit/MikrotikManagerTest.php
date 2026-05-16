@@ -1,48 +1,58 @@
 <?php
 
+use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
 use ZillEAli\MikrotikLaravel\MikrotikManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 use ZillEAli\MikrotikLaravel\Services\SystemManager;
-use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
 
 // ─── Helper — MikrotikManager with mocked client ──────────────
 
 function makeManager(array $configOverride = []): MikrotikManager
 {
     $config = array_merge([
-        'host'           => '127.0.0.1',
-        'port'           => 8728,
-        'username'       => 'admin',
-        'password'       => '',
-        'timeout'        => 1,
+        'host' => '127.0.0.1',
+        'port' => 8728,
+        'username' => 'admin',
+        'password' => '',
+        'timeout' => 1,
         'retry_attempts' => 1,
-        'retry_delay'    => 0,
-        'routers'        => [
+        'retry_delay' => 0,
+        'routers' => [
             'branch' => [
-                'host'     => '127.0.0.2',
-                'port'     => 8728,
+                'host' => '127.0.0.2',
+                'port' => 8728,
                 'username' => 'admin',
                 'password' => '',
-                'timeout'  => 1,
+                'timeout' => 1,
             ],
         ],
     ], $configOverride);
 
-    return new class($config) extends MikrotikManager {
+    return new class ($config) extends MikrotikManager {
         protected function getClient(): \ZillEAli\MikrotikLaravel\Connections\RouterosClient
         {
             $this->resolveAndResetRouter(); // ← reset call karo
 
-            return new class extends \ZillEAli\MikrotikLaravel\Connections\RouterosClient {
-                public function __construct() {
+            return new class () extends \ZillEAli\MikrotikLaravel\Connections\RouterosClient {
+                public function __construct()
+                {
                     parent::__construct(host: '127.0.0.1');
                 }
-                public function query(string $command, array $params = [], array $queries = []): array { return []; }
-                public function send(array $words): array { return []; }
-                public function isConnected(): bool { return true; }
+                public function query(string $command, array $params = [], array $queries = []): array
+                {
+                    return [];
+                }
+                public function send(array $words): array
+                {
+                    return [];
+                }
+                public function isConnected(): bool
+                {
+                    return true;
+                }
             };
         }
     };
@@ -95,10 +105,10 @@ it('resets to default router after selection', function () {
 
 it('throws ConnectionException for unknown router name', function () {
     $manager = new MikrotikManager([
-        'host'           => '127.0.0.1',
+        'host' => '127.0.0.1',
         'retry_attempts' => 1,
-        'retry_delay'    => 0,
-        'routers'        => [],
+        'retry_delay' => 0,
+        'routers' => [],
     ]);
 
     expect(fn () => $manager->router('nonexistent')->pppoe())

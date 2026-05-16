@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 
 function makeRadiusClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -37,7 +44,7 @@ it('returns all radius servers', function () {
 });
 
 it('returns empty array when no radius servers configured', function () {
-    $client  = makeRadiusClient(['/radius/print' => []]);
+    $client = makeRadiusClient(['/radius/print' => []]);
     $manager = new RadiusManager($client);
 
     expect($manager->getServers())->toBeEmpty();
@@ -53,14 +60,14 @@ it('returns single radius server by address', function () {
     ]);
 
     $manager = new RadiusManager($client);
-    $server  = $manager->getServer('172.16.24.17');
+    $server = $manager->getServer('172.16.24.17');
 
     expect($server)->not->toBeNull()
         ->and($server['address'])->toBe('172.16.24.17');
 });
 
 it('returns null when radius server not found', function () {
-    $client  = makeRadiusClient(['/radius/print' => []]);
+    $client = makeRadiusClient(['/radius/print' => []]);
     $manager = new RadiusManager($client);
 
     expect($manager->getServer('99.99.99.99'))->toBeNull();
@@ -69,12 +76,12 @@ it('returns null when radius server not found', function () {
 // ─── addServer ────────────────────────────────────────────────
 
 it('adds radius server without throwing', function () {
-    $client  = makeRadiusClient();
+    $client = makeRadiusClient();
     $manager = new RadiusManager($client);
 
     expect(fn () => $manager->addServer([
         'address' => '172.16.24.17',
-        'secret'  => 'testing123',
+        'secret' => 'testing123',
         'service' => 'ppp,hotspot',
     ]))->not->toThrow(\Exception::class);
 });
@@ -132,7 +139,7 @@ it('returns radius incoming config', function () {
     ]);
 
     $manager = new RadiusManager($client);
-    $config  = $manager->getIncomingConfig();
+    $config = $manager->getIncomingConfig();
 
     expect($config)->not->toBeEmpty()
         ->and($config['accept'])->toBe('true')
@@ -166,7 +173,7 @@ it('returns false when radius server is disabled', function () {
 });
 
 it('returns false when radius server does not exist', function () {
-    $client  = makeRadiusClient(['/radius/print' => []]);
+    $client = makeRadiusClient(['/radius/print' => []]);
     $manager = new RadiusManager($client);
 
     expect($manager->isServerActive('99.99.99.99'))->toBeFalse();

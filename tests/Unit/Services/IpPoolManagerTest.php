@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 
 function makeIpPoolClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -29,7 +36,7 @@ it('returns all ip pools', function () {
     ]);
 
     $manager = new IpPoolManager($client);
-    $pools   = $manager->getPools();
+    $pools = $manager->getPools();
 
     expect($pools)->toHaveCount(2)
         ->and($pools[0]['name'])->toBe('pppoe-pool')
@@ -37,7 +44,7 @@ it('returns all ip pools', function () {
 });
 
 it('returns empty array when no pools exist', function () {
-    $client  = makeIpPoolClient(['/ip/pool/print' => []]);
+    $client = makeIpPoolClient(['/ip/pool/print' => []]);
     $manager = new IpPoolManager($client);
 
     expect($manager->getPools())->toBeEmpty();
@@ -53,14 +60,14 @@ it('returns single pool by name', function () {
     ]);
 
     $manager = new IpPoolManager($client);
-    $pool    = $manager->getPool('pppoe-pool');
+    $pool = $manager->getPool('pppoe-pool');
 
     expect($pool)->not->toBeNull()
         ->and($pool['name'])->toBe('pppoe-pool');
 });
 
 it('returns null when pool not found', function () {
-    $client  = makeIpPoolClient(['/ip/pool/print' => []]);
+    $client = makeIpPoolClient(['/ip/pool/print' => []]);
     $manager = new IpPoolManager($client);
 
     expect($manager->getPool('nonexistent'))->toBeNull();
@@ -77,7 +84,7 @@ it('returns used ip addresses from pool', function () {
     ]);
 
     $manager = new IpPoolManager($client);
-    $used    = $manager->getUsedAddresses('pppoe-pool');
+    $used = $manager->getUsedAddresses('pppoe-pool');
 
     expect($used)->toHaveCount(2)
         ->and($used[0]['address'])->toBe('10.0.0.1')
@@ -85,7 +92,7 @@ it('returns used ip addresses from pool', function () {
 });
 
 it('returns empty array when pool has no used addresses', function () {
-    $client  = makeIpPoolClient(['/ip/pool/used/print' => []]);
+    $client = makeIpPoolClient(['/ip/pool/used/print' => []]);
     $manager = new IpPoolManager($client);
 
     expect($manager->getUsedAddresses('pppoe-pool'))->toBeEmpty();
@@ -94,11 +101,11 @@ it('returns empty array when pool has no used addresses', function () {
 // ─── createPool ───────────────────────────────────────────────
 
 it('creates ip pool without throwing', function () {
-    $client  = makeIpPoolClient();
+    $client = makeIpPoolClient();
     $manager = new IpPoolManager($client);
 
     expect(fn () => $manager->createPool([
-        'name'   => 'new-pool',
+        'name' => 'new-pool',
         'ranges' => '10.1.0.1-10.1.0.254',
     ]))->not->toThrow(\Exception::class);
 });

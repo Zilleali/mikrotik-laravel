@@ -34,18 +34,19 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RouterUserManager
 {
-    private const CMD_USER_PRINT    = '/user/print';
-    private const CMD_USER_ADD      = '/user/add';
-    private const CMD_USER_SET      = '/user/set';
-    private const CMD_USER_REMOVE   = '/user/remove';
-    private const CMD_USER_ENABLE   = '/user/enable';
-    private const CMD_USER_DISABLE  = '/user/disable';
-    private const CMD_GROUP_PRINT   = '/user/group/print';
-    private const CMD_ACTIVE_PRINT  = '/user/active/print';
+    private const CMD_USER_PRINT = '/user/print';
+    private const CMD_USER_ADD = '/user/add';
+    private const CMD_USER_SET = '/user/set';
+    private const CMD_USER_REMOVE = '/user/remove';
+    private const CMD_USER_ENABLE = '/user/enable';
+    private const CMD_USER_DISABLE = '/user/disable';
+    private const CMD_GROUP_PRINT = '/user/group/print';
+    private const CMD_ACTIVE_PRINT = '/user/active/print';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Users
@@ -225,7 +226,7 @@ class RouterUserManager
     public function addGroup(string $name, string $policy): void
     {
         $this->client->query('/user/group/add', [
-            'name'   => $name,
+            'name' => $name,
             'policy' => $policy,
         ]);
     }

@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\WirelessManager;
 
 function makeWirelessClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -28,7 +35,7 @@ it('returns wireless interfaces', function () {
         ],
     ]);
 
-    $manager    = new WirelessManager($client);
+    $manager = new WirelessManager($client);
     $interfaces = $manager->getInterfaces();
 
     expect($interfaces)->toHaveCount(2)
@@ -55,7 +62,7 @@ it('returns registration table (connected clients)', function () {
 });
 
 it('returns empty registration table when no clients connected', function () {
-    $client  = makeWirelessClient(['/interface/wireless/registration-table/print' => []]);
+    $client = makeWirelessClient(['/interface/wireless/registration-table/print' => []]);
     $manager = new WirelessManager($client);
 
     expect($manager->getRegistrationTable())->toBeEmpty();
@@ -89,7 +96,7 @@ it('returns access list entries', function () {
     ]);
 
     $manager = new WirelessManager($client);
-    $list    = $manager->getAccessList();
+    $list = $manager->getAccessList();
 
     expect($list)->toHaveCount(2)
         ->and($list[0]['mac-address'])->toBe('AA:BB:CC:DD:EE:01');
@@ -98,13 +105,13 @@ it('returns access list entries', function () {
 // ─── addToAccessList ──────────────────────────────────────────
 
 it('adds mac to access list without throwing', function () {
-    $client  = makeWirelessClient();
+    $client = makeWirelessClient();
     $manager = new WirelessManager($client);
 
     expect(fn () => $manager->addToAccessList('AA:BB:CC:DD:EE:FF', [
-        'interface'      => 'wlan1',
+        'interface' => 'wlan1',
         'authentication' => 'true',
-        'comment'        => 'trusted device',
+        'comment' => 'trusted device',
     ]))->not->toThrow(\Exception::class);
 });
 
