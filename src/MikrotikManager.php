@@ -14,6 +14,7 @@ use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 use ZillEAli\MikrotikLaravel\Services\WirelessManager;
 use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 use ZillEAli\MikrotikLaravel\Services\RadiusManager;
+use ZillEAli\MikrotikLaravel\Support\CachingProxy;
 
 /**
  * MikrotikManager
@@ -326,5 +327,23 @@ class MikrotikManager
     public function radius(): RadiusManager
     {
         return new RadiusManager($this->getClient());
+    }
+
+    /**
+     * Wrap a manager with caching layer.
+     *
+     * Usage:
+     *  MikroTik::cache(30)->pppoe()->getSecrets()
+     *
+     * Or wrap specific manager:
+     *  $cached = MikroTik::pppoe()->withCache(30);
+     *  $cached->getSecrets(); // cached
+     *
+     * @param  int $ttl Cache TTL in seconds
+     * @return CachingProxy
+     */
+    public function withCache(object $manager, int $ttl = 30): CachingProxy
+    {
+        return new CachingProxy($manager, $ttl);
     }
 }
