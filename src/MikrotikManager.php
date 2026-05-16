@@ -15,6 +15,11 @@ use ZillEAli\MikrotikLaravel\Services\WirelessManager;
 use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Support\CachingProxy;
+use Illuminate\Support\Facades\Event;
+use ZillEAli\MikrotikLaravel\Events\RouterConnected;
+use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
+use ZillEAli\MikrotikLaravel\Events\SessionCreated;
+use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 
 /**
  * MikrotikManager
@@ -113,7 +118,7 @@ class MikrotikManager
         $attempts = $this->config['retry_attempts'] ?? 1;
         $delay = $this->config['retry_delay'] ?? 1000;
 
-        $this->connectWithRetry($client, $attempts, $delay);
+        $this->connectWithRetry($client, $attempts, $delay, $name, $cfg); //
 
         $this->connections[$name] = $client;
 
@@ -133,23 +138,42 @@ class MikrotikManager
     protected function connectWithRetry(
         RouterosClient $client,
         int $attempts,
-        int $delay
+        int $delay,
+        string $routerName = 'default',
+        array $cfg = [],
     ): void {
         $lastException = null;
 
         for ($i = 1; $i <= $attempts; $i++) {
             try {
                 $client->connect();
-                return; // connected — done
+
+                // Fire connected event
+                Event::dispatch(new RouterConnected(
+                    host: $cfg['host'] ?? '',
+                    port: $cfg['port'] ?? 8728,
+                    router: $routerName,
+                ));
+
+                return;
             } catch (ConnectionException $e) {
                 $lastException = $e;
 
-                // Don't wait after the last attempt
                 if ($i < $attempts) {
-                    usleep($delay * 1000); // ms to microseconds
+                    usleep($delay * 1000);
                 }
             }
         }
+
+        // Fire unreachable event after all attempts fail
+        Event::dispatch(new RouterUnreachable(
+            host: $cfg['host'] ?? '',
+            port: $cfg['port'] ?? 8728,
+            router: $routerName,
+            attempts: $attempts,
+            error: $lastException?->getMessage() ?? '',
+            exception: $lastException,
+        ));
 
         throw new ConnectionException(
             "Failed to connect after {$attempts} attempt(s): " .
