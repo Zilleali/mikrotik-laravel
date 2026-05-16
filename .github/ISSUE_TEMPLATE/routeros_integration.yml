@@ -1,0 +1,138 @@
+name: RouterOS Integration Issue
+description: Connection problems, authentication failures, or protocol-level issues with specific MikroTik hardware
+title: "[RouterOS]: "
+labels: ["routeros", "needs-triage"]
+assignees:
+  - Zilleali
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues specific to MikroTik hardware —
+        connection failures, login problems, unexpected API responses,
+        or hardware compatibility issues.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Basic checks
+      options:
+        - label: "API service is enabled: IP → Services → api → enabled"
+          required: true
+        - label: API port (8728/8729) is not blocked by firewall rules
+          required: true
+        - label: The API user has correct permissions (api policy enabled)
+          required: true
+        - label: I can connect via Winbox or SSH to the router
+          required: true
+
+  - type: dropdown
+    id: hardware
+    attributes:
+      label: MikroTik hardware model
+      options:
+        - hAP ac² (RBD52G)
+        - hAP ac³
+        - hAP lite
+        - RB750Gr3 (hEX)
+        - RB760iGS (hEX S)
+        - CCR1009 series
+        - CCR1016 series
+        - CCR1036 series
+        - CCR2004 series
+        - CRS series (switch)
+        - RB4011 series
+        - LtAP series
+        - wAP series
+        - Audience series
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: routeros-version
+    attributes:
+      label: RouterOS version (exact)
+      description: Run on router — /system/resource/print — paste version field
+      placeholder: "e.g. 7.14.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      options:
+        - Connection refused (cannot connect)
+        - Connection timeout
+        - Login failed / authentication error
+        - SSL/TLS connection issue (port 8729)
+        - Command returns unexpected data
+        - Command not found on this RouterOS version
+        - Works on RouterOS 6 but not 7 (or vice versa)
+        - Works locally but not remotely
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: connection-config
+    attributes:
+      label: Connection configuration used
+      description: Paste your config (mask the password)
+      render: php
+      placeholder: |
+        $client = new RouterosClient(
+            host:     '192.168.88.1',
+            port:     8728,
+            username: 'admin',
+            password: '***',
+            timeout:  10,
+        );
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error / exception
+      render: shell
+      placeholder: |
+        ZillEAli\MikrotikLaravel\Exceptions\ConnectionException:
+        Cannot connect to 192.168.88.1:8728 — Connection refused (111)
+    validations:
+      required: true
+
+  - type: textarea
+    id: router-api-settings
+    attributes:
+      label: Router API service settings
+      description: |
+        Run in router terminal and paste output:
+        /ip/service/print where name=api
+      render: shell
+      placeholder: |
+        Flags: X - disabled
+         0   name="api" port=8728 address="" max-sessions=20 disabled=no
+    validations:
+      required: true
+
+  - type: textarea
+    id: router-user-policy
+    attributes:
+      label: API user group policy
+      description: |
+        Run in router terminal:
+        /user/group/print where name=<your-api-user-group>
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Network topology, NAT between server and router, VPN, etc.
+    validations:
+      required: false
