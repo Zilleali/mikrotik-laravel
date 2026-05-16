@@ -9,6 +9,9 @@ use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 use ZillEAli\MikrotikLaravel\Services\SystemManager;
+use ZillEAli\MikrotikLaravel\Commands\MikrotikMonitor;
+use ZillEAli\MikrotikLaravel\Commands\MikrotikPing;
+use ZillEAli\MikrotikLaravel\Commands\MikrotikSync;
 
 /**
  * MikrotikServiceProvider
@@ -56,9 +59,17 @@ class MikrotikServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
+            // Publish config
             $this->publishes([
                 __DIR__ . '/../config/mikrotik.php' => config_path('mikrotik.php'),
             ], 'mikrotik-config');
+
+            // Register artisan commands
+            $this->commands([
+                MikrotikPing::class,
+                MikrotikSync::class,
+                MikrotikMonitor::class,
+            ]);
         }
     }
 
