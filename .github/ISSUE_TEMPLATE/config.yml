@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Documentation
+    url: https://github.com/Zilleali/mikrotik-laravel#readme
+    about: Read the full README before opening an issue
+
+  - name: MikroTik RouterOS API Docs
+    url: https://help.mikrotik.com/docs/display/ROS/API
+    about: Official RouterOS API documentation
+
+  - name: Security Vulnerability
+    url: mailto:zilleali1245@gmail.com
+    about: Report security issues privately — do not use GitHub issues for security vulnerabilities

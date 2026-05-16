@@ -1,28 +1,146 @@
-name: Bug report
-description: Report a bug or unexpected behavior
-labels: [bug]
+name: Bug Report
+description: Report a bug or unexpected behavior in zilleali/mikrotik-laravel
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees:
+  - Zilleali
+
 body:
-  - type: dropdown
+  - type: markdown
     attributes:
-      label: RouterOS version
-      options: [7.x, 6.49.x, Other]
+      value: |
+        Thanks for reporting a bug! Please fill in as much detail as possible.
+        **Do not report security vulnerabilities here** — email zilleali1245@gmail.com instead.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I am using the latest version of the package
+          required: true
+        - label: I have enabled the API service on my MikroTik router
+          required: true
+
+  - type: dropdown
+    id: manager
+    attributes:
+      label: Which manager is affected?
+      multiple: false
+      options:
+        - RouterosClient (connection / login)
+        - PppoeManager
+        - HotspotManager
+        - QueueManager
+        - FirewallManager
+        - SystemManager
+        - Facade / ServiceProvider
+        - Other
+    validations:
+      required: true
+
   - type: input
+    id: package-version
     attributes:
       label: Package version
+      placeholder: "e.g. 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "e.g. 8.3.4"
+    validations:
+      required: true
+
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel version
+      placeholder: "e.g. 12.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: routeros-version
+    attributes:
+      label: RouterOS version
+      options:
+        - "7.x (latest)"
+        - "7.x (older)"
+        - "6.49.x"
+        - "6.48.x or older"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api-port
+    attributes:
+      label: API connection type
+      options:
+        - "Plain — port 8728"
+        - "SSL — port 8729"
+    validations:
+      required: true
+
   - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: What happened? What did you expect to happen?
+      placeholder: |
+        Expected: MikroTik::pppoe()->getSecrets() returns all PPPoE users
+        Actual: Returns empty array / throws ConnectionException
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
     attributes:
       label: Steps to reproduce
-  - type: textarea
-    attributes:
-      label: Expected vs actual behavior
+      description: Minimal code to reproduce the issue
+      render: php
+      placeholder: |
+        $client = new RouterosClient(
+            host: '192.168.88.1',
+            username: 'admin',
+            password: 'password',
+        );
+        $client->connect();
+        $manager = new PppoeManager($client);
+        $result  = $manager->getSecrets(); // empty / error here
+    validations:
+      required: true
 
---- feature_request.yml ---
-name: Feature request
-labels: [enhancement]
-body:
-  - type: dropdown
-    attributes:
-      label: Feature area
-      options: [PPPoE, Hotspot, Queue, Interface, Firewall, DHCP, System, Filament widget]
   - type: textarea
+    id: error-output
     attributes:
+      label: Error output / stack trace
+      description: Paste the full exception message or error output
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: router-config
+    attributes:
+      label: Relevant router configuration
+      description: |
+        Any RouterOS settings that might be relevant.
+        Run on router: /ip/service/print — paste the api row.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might help debug this issue
+    validations:
+      required: false

@@ -1,0 +1,109 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees:
+  - Zilleali
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! This package targets ISP engineers —
+        please describe your use case clearly so we can prioritize correctly.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this has not been requested before
+          required: true
+        - label: This feature is related to MikroTik RouterOS API functionality
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      description: Which part of the package does this belong to?
+      multiple: false
+      options:
+        - PppoeManager — new method
+        - HotspotManager — new method
+        - QueueManager — new method
+        - FirewallManager — new method
+        - SystemManager — new method
+        - New Manager (WirelessManager, VpnManager, etc.)
+        - RouterosClient — core improvement
+        - Caching layer
+        - Retry mechanism
+        - Filament widgets
+        - Events / Listeners
+        - Artisan commands
+        - Configuration
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority for ISP use case
+      options:
+        - "Critical — blocks production use"
+        - "High — needed for common ISP operations"
+        - "Medium — useful but has workaround"
+        - "Low — nice to have"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem are you trying to solve? What ISP operation does this enable?
+      placeholder: |
+        As an ISP engineer, I need to manage wireless clients programmatically.
+        Currently there is no WirelessManager so I cannot get registration table
+        or access list from Laravel.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should this feature work? Show example code if possible.
+      render: php
+      placeholder: |
+        MikroTik::wireless()->getRegistrationTable();
+        // returns: [['mac-address' => 'AA:BB:CC:DD:EE:FF', 'signal-strength' => '-65', ...]]
+
+        MikroTik::wireless()->getInterfaces();
+        MikroTik::wireless()->addToAccessList('AA:BB:CC:DD:EE:FF', ['comment' => 'trusted']);
+    validations:
+      required: true
+
+  - type: textarea
+    id: routeros-command
+    attributes:
+      label: RouterOS API command
+      description: |
+        If you know the RouterOS API path, paste it here.
+        You can find it in Winbox terminal or RouterOS API documentation.
+      render: shell
+      placeholder: |
+        /interface/wireless/registration-table/print
+        /interface/wireless/print
+        /interface/wireless/access-list/add
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds you are currently using?
+    validations:
+      required: false
