@@ -25,23 +25,24 @@ class PppoeManager
     /**
      * RouterOS API commands
      */
-    private const CMD_SECRET_PRINT   = '/ppp/secret/print';
-    private const CMD_SECRET_ADD     = '/ppp/secret/add';
-    private const CMD_SECRET_SET     = '/ppp/secret/set';
-    private const CMD_SECRET_REMOVE  = '/ppp/secret/remove';
-    private const CMD_SECRET_ENABLE  = '/ppp/secret/enable';
+    private const CMD_SECRET_PRINT = '/ppp/secret/print';
+    private const CMD_SECRET_ADD = '/ppp/secret/add';
+    private const CMD_SECRET_SET = '/ppp/secret/set';
+    private const CMD_SECRET_REMOVE = '/ppp/secret/remove';
+    private const CMD_SECRET_ENABLE = '/ppp/secret/enable';
     private const CMD_SECRET_DISABLE = '/ppp/secret/disable';
-    private const CMD_ACTIVE_PRINT   = '/ppp/active/print';
-    private const CMD_ACTIVE_REMOVE  = '/ppp/active/remove';
-    private const CMD_PROFILE_PRINT  = '/ppp/profile/print';
-    private const CMD_PROFILE_ADD    = '/ppp/profile/add';
+    private const CMD_ACTIVE_PRINT = '/ppp/active/print';
+    private const CMD_ACTIVE_REMOVE = '/ppp/active/remove';
+    private const CMD_PROFILE_PRINT = '/ppp/profile/print';
+    private const CMD_PROFILE_ADD = '/ppp/profile/add';
 
     /**
      * @param RouterosClient $client Authenticated RouterOS client
      */
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Secrets (PPPoE Users)
@@ -104,7 +105,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (! $secret) {
+        if (!$secret) {
             return;
         }
 
@@ -124,7 +125,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (! $secret) {
+        if (!$secret) {
             return;
         }
 
@@ -144,7 +145,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (! $secret) {
+        if (!$secret) {
             return;
         }
 
@@ -164,7 +165,7 @@ class PppoeManager
     {
         $secret = $this->getSecret($name);
 
-        if (! $secret) {
+        if (!$secret) {
             return;
         }
 
@@ -269,10 +270,25 @@ class PppoeManager
             return;
         }
 
+        $session = $sessions[0];
+
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,
-            ['.id' => $sessions[0]['.id']]
+            ['.id' => $session['.id']]
         );
+
+        // Dispatch event — listeners handle notifications/billing
+        if (class_exists(\Illuminate\Support\Facades\Event::class)) {
+            \Illuminate\Support\Facades\Event::dispatch(
+                new \ZillEAli\MikrotikLaravel\Events\SessionDisconnected(
+                    username: $name,
+                    ip: $session['address'] ?? null,
+                    uptime: $session['uptime'] ?? null,
+                    reason: 'manual',
+                    raw: $session,
+                )
+            );
+        }
     }
 
     // =========================================================
