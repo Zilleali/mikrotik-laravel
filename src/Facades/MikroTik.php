@@ -23,6 +23,10 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static SystemManager    system()
  * @method static void             disconnect(string $name = 'default')
  * @method static void             disconnectAll()
+ * @method static DhcpManager      dhcp()
+ * @method static InterfaceManager  interfaces()
+ * @method static WirelessManager   wireless()
+ * 
  *
  * @see MikrotikManager
  *
