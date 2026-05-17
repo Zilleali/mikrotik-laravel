@@ -24,6 +24,8 @@ use ZillEAli\MikrotikLaravel\Services\VpnManager;
 use ZillEAli\MikrotikLaravel\Services\WirelessManager; // VPN Manager for WireGuard and OpenVPN support
 use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New SSL connection class for secure API access
 use ZillEAli\MikrotikLaravel\Services\BridgeManager; // New manager for managing bridges and VLANs
+use ZillEAli\MikrotikLaravel\Connections\ConnectionPool; // New connection pool for efficient connection reuse
+
 
 /**
  * MikrotikManager
@@ -42,12 +44,10 @@ use ZillEAli\MikrotikLaravel\Services\BridgeManager; // New manager for managing
 class MikrotikManager
 {
     /**
-     * Active RouterosClient instances keyed by router name.
+     * Connection pool — persistent RouterosClient instances keyed by router name.
      * Prevents reconnecting on every method call.
-     *
-     * @var array<string, RouterosClient>
      */
-    protected array $connections = [];
+    protected ConnectionPool $pool;
 
     /**
      * Currently selected router name.
@@ -58,9 +58,9 @@ class MikrotikManager
     /**
      * @param array $config Full mikrotik config array
      */
-    public function __construct(
-        protected array $config
-    ) {
+    public function __construct(protected array $config)
+    {
+        $this->pool = new ConnectionPool();
     }
 
     // =========================================================
@@ -92,8 +92,8 @@ class MikrotikManager
     /**
      * Get or create a RouterosClient for the current router.
      *
-     * Caches connections by router name to avoid reconnecting.
-     * Implements retry logic based on config retry_attempts.
+     * Uses ConnectionPool to cache connections.
+     * Implements SSL/plain selection and retry logic.
      *
      * @return RouterosClient
      * @throws ConnectionException
@@ -102,48 +102,54 @@ class MikrotikManager
     {
         $name = $this->resolveAndResetRouter();
 
-        if (
-            isset($this->connections[$name]) &&
-            $this->connections[$name]->isConnected()
-        ) {
-            return $this->connections[$name];
+        // Return cached alive connection
+        if ($this->pool->isAlive($name)) {
+            return $this->pool->get($name);
         }
 
-        $cfg = $this->getRouterConfig($name);
-
-        // SSL ya plain — config se decide hoga
+        $cfg    = $this->getRouterConfig($name);
         $useSSL = $cfg['ssl'] ?? $this->config['ssl'] ?? false;
 
         if ($useSSL) {
             $client = new RouterosClientSSL(
-                host: $cfg['host'],
-                port: $cfg['port'] ?? 8729,
-                username: $cfg['username'] ?? 'admin',
-                password: $cfg['password'] ?? '',
-                timeout: $cfg['timeout'] ?? 10,
+                host:       $cfg['host'],
+                port:       $cfg['port']        ?? 8729,
+                username:   $cfg['username']    ?? 'admin',
+                password:   $cfg['password']    ?? '',
+                timeout:    $cfg['timeout']     ?? 10,
                 verifyPeer: $cfg['verify_peer'] ?? false,
                 caCertPath: $cfg['ca_cert_path'] ?? null,
             );
         } else {
             $client = new RouterosClient(
-                host: $cfg['host'],
-                port: $cfg['port'] ?? 8728,
+                host:     $cfg['host'],
+                port:     $cfg['port']     ?? 8728,
                 username: $cfg['username'] ?? 'admin',
                 password: $cfg['password'] ?? '',
-                timeout: $cfg['timeout'] ?? 10,
+                timeout:  $cfg['timeout']  ?? 10,
             );
         }
 
         $attempts = $this->config['retry_attempts'] ?? 1;
-        $delay = $this->config['retry_delay'] ?? 1000;
+        $delay    = $this->config['retry_delay']    ?? 1000;
 
         $this->connectWithRetry($client, $attempts, $delay, $name, $cfg);
 
-        $this->connections[$name] = $client;
+        $this->pool->add($name, $client);
 
         return $client;
     }
 
+    /**
+     * Return current router name and reset to default.
+     */
+    protected function resolveAndResetRouter(): string
+    {
+        $name                = $this->currentRouter;
+        $this->currentRouter = 'default';
+
+        return $name;
+    }
 
     /**
      * Connect with automatic retry on failure.
@@ -151,6 +157,8 @@ class MikrotikManager
      * @param  RouterosClient $client
      * @param  int            $attempts  Max connection attempts
      * @param  int            $delay     Delay between retries in milliseconds
+     * @param  string         $routerName
+     * @param  array          $cfg
      * @return void
      * @throws ConnectionException After all attempts fail
      */
@@ -167,14 +175,14 @@ class MikrotikManager
             try {
                 $client->connect();
 
-                // Fire connected event
                 Event::dispatch(new RouterConnected(
-                    host: $cfg['host'] ?? '',
-                    port: $cfg['port'] ?? 8728,
+                    host:   $cfg['host'] ?? '',
+                    port:   $cfg['port'] ?? 8728,
                     router: $routerName,
                 ));
 
                 return;
+
             } catch (ConnectionException $e) {
                 $lastException = $e;
 
@@ -184,13 +192,12 @@ class MikrotikManager
             }
         }
 
-        // Fire unreachable event after all attempts fail
         Event::dispatch(new RouterUnreachable(
-            host: $cfg['host'] ?? '',
-            port: $cfg['port'] ?? 8728,
-            router: $routerName,
-            attempts: $attempts,
-            error: $lastException?->getMessage() ?? '',
+            host:      $cfg['host']     ?? '',
+            port:      $cfg['port']     ?? 8728,
+            router:    $routerName,
+            attempts:  $attempts,
+            error:     $lastException?->getMessage() ?? '',
             exception: $lastException,
         ));
 
@@ -203,9 +210,6 @@ class MikrotikManager
     /**
      * Get config array for a named router.
      *
-     * 'default' uses top-level config keys.
-     * Named routers use config.routers.{name}.
-     *
      * @param  string $name
      * @return array
      * @throws ConnectionException If router name not found in config
@@ -214,15 +218,15 @@ class MikrotikManager
     {
         if ($name === 'default') {
             return [
-                'host' => $this->config['host'] ?? '192.168.88.1',
-                'port' => $this->config['port'] ?? 8728,
+                'host'     => $this->config['host']     ?? '192.168.88.1',
+                'port'     => $this->config['port']     ?? 8728,
                 'username' => $this->config['username'] ?? 'admin',
                 'password' => $this->config['password'] ?? '',
-                'timeout' => $this->config['timeout'] ?? 10,
+                'timeout'  => $this->config['timeout']  ?? 10,
             ];
         }
 
-        if (!isset($this->config['routers'][$name])) {
+        if (! isset($this->config['routers'][$name])) {
             throw new ConnectionException(
                 "Router '{$name}' not found in config/mikrotik.php routers array."
             );
@@ -239,10 +243,7 @@ class MikrotikManager
      */
     public function disconnect(string $name = 'default'): void
     {
-        if (isset($this->connections[$name])) {
-            $this->connections[$name]->disconnect();
-            unset($this->connections[$name]);
-        }
+        $this->pool->remove($name);
     }
 
     /**
@@ -252,138 +253,110 @@ class MikrotikManager
      */
     public function disconnectAll(): void
     {
-        foreach ($this->connections as $client) {
-            $client->disconnect();
-        }
+        $this->pool->flush();
+    }
 
-        $this->connections = [];
+    /**
+     * Get the connection pool instance.
+     *
+     * @return ConnectionPool
+     */
+    public function getPool(): ConnectionPool
+    {
+        return $this->pool;
     }
 
     // =========================================================
     // Service Managers
     // =========================================================
 
-    /**
-     * Get PPPoE manager for the current router.
-     *
-     * @return PppoeManager
-     */
+    /** @return PppoeManager */
     public function pppoe(): PppoeManager
     {
         return new PppoeManager($this->getClient());
     }
 
-    /**
-     * Get Hotspot manager for the current router.
-     *
-     * @return HotspotManager
-     */
+    /** @return HotspotManager */
     public function hotspot(): HotspotManager
     {
         return new HotspotManager($this->getClient());
     }
 
-    /**
-     * Get Queue manager for the current router.
-     *
-     * @return QueueManager
-     */
+    /** @return QueueManager */
     public function queue(): QueueManager
     {
         return new QueueManager($this->getClient());
     }
 
-    /**
-     * Get Firewall manager for the current router.
-     *
-     * @return FirewallManager
-     */
+    /** @return FirewallManager */
     public function firewall(): FirewallManager
     {
         return new FirewallManager($this->getClient());
     }
 
-    /**
-     * Get System manager for the current router.
-     *
-     * @return SystemManager
-     */
+    /** @return SystemManager */
     public function system(): SystemManager
     {
         return new SystemManager($this->getClient());
     }
-    /**
-     * Return current router name and reset to default.
-     */
-    protected function resolveAndResetRouter(): string
-    {
-        $name = $this->currentRouter;
-        $this->currentRouter = 'default';
 
-        return $name;
-    }
-
-    /**
-     * Get Interface manager for the current router.
-     *
-     * @return InterfaceManager
-     */
+    /** @return InterfaceManager */
     public function interfaces(): InterfaceManager
     {
         return new InterfaceManager($this->getClient());
     }
 
-    /**
-     * Get DHCP manager for the current router.
-     *
-     * @return DhcpManager
-     */
+    /** @return DhcpManager */
     public function dhcp(): DhcpManager
     {
         return new DhcpManager($this->getClient());
     }
 
-    /**
-     * Get Wireless manager for the current router.
-     *
-     * @return WirelessManager
-     */
+    /** @return WirelessManager */
     public function wireless(): WirelessManager
     {
         return new WirelessManager($this->getClient());
     }
 
-    /**
-     * Get IP Pool manager for the current router.
-     *
-     * @return IpPoolManager
-     */
+    /** @return IpPoolManager */
     public function ipPool(): IpPoolManager
     {
         return new IpPoolManager($this->getClient());
     }
 
-    /**
-     * Get RADIUS manager for the current router.
-     *
-     * @return RadiusManager
-     */
+    /** @return RadiusManager */
     public function radius(): RadiusManager
     {
         return new RadiusManager($this->getClient());
     }
 
+    /** @return RouterUserManager */
+    public function routerUsers(): RouterUserManager
+    {
+        return new RouterUserManager($this->getClient());
+    }
+
+    /** @return VpnManager */
+    public function vpn(): VpnManager
+    {
+        return new VpnManager($this->getClient());
+    }
+
+    /** @return BridgeManager */
+    public function bridge(): BridgeManager
+    {
+        return new BridgeManager($this->getClient());
+    }
+
+    // =========================================================
+    // Caching
+    // =========================================================
+
     /**
      * Wrap a manager with caching layer.
      *
-     * Usage:
-     *  MikroTik::cache(30)->pppoe()->getSecrets()
-     *
-     * Or wrap specific manager:
-     *  $cached = MikroTik::pppoe()->withCache(30);
-     *  $cached->getSecrets(); // cached
-     *
-     * @param  int $ttl Cache TTL in seconds
+     * @param  object $manager Any manager instance
+     * @param  int    $ttl     Cache TTL in seconds
      * @return CachingProxy
      */
     public function withCache(object $manager, int $ttl = 30): CachingProxy
@@ -391,25 +364,16 @@ class MikrotikManager
         return new CachingProxy($manager, $ttl);
     }
 
-    /**
-     * Get Router User manager for the current router.
-     *
-     * Manages Winbox/SSH/API users — NOT PPPoE/Hotspot users.
-     *
-     * @return RouterUserManager
-     */
-    public function routerUsers(): RouterUserManager
-    {
-        return new RouterUserManager($this->getClient());
-    }
+    // =========================================================
+    // Events
+    // =========================================================
 
     /**
      * Dispatch SessionCreated event.
-     * Call this from your app after a new PPPoE user connects.
      *
      * @param  string      $username
      * @param  string      $ip
-     * @param  string      $service  'pppoe' or 'hotspot'
+     * @param  string      $service
      * @param  string|null $mac
      * @return void
      */
@@ -420,17 +384,16 @@ class MikrotikManager
         ?string $mac = null,
     ): void {
         Event::dispatch(new SessionCreated(
-            username: $username,
-            ip: $ip,
-            router: $this->currentRouter,
-            service: $service,
+            username:   $username,
+            ip:         $ip,
+            router:     $this->currentRouter,
+            service:    $service,
             macAddress: $mac,
         ));
     }
 
     /**
      * Dispatch SessionDisconnected event.
-     * Call this from your app after a PPPoE session ends.
      *
      * @param  string      $username
      * @param  string|null $ip
@@ -446,31 +409,10 @@ class MikrotikManager
     ): void {
         Event::dispatch(new SessionDisconnected(
             username: $username,
-            router: $this->currentRouter,
-            ip: $ip,
-            uptime: $uptime,
-            reason: $reason,
+            router:   $this->currentRouter,
+            ip:       $ip,
+            uptime:   $uptime,
+            reason:   $reason,
         ));
-    }
-
-    /**
-     * Get VPN manager for the current router.
-     *
-     * Supports WireGuard peers, L2TP sessions, PPTP sessions.
-     *
-     * @return VpnManager
-     */
-    public function vpn(): VpnManager
-    {
-        return new VpnManager($this->getClient());
-    }
-    /**
-     * Get Bridge manager for the current router.
-     *
-     * @return BridgeManager
-     */
-    public function bridge(): BridgeManager
-    {
-        return new BridgeManager($this->getClient());
     }
 }
