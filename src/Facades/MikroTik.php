@@ -32,7 +32,7 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static void dispatchSessionCreated(string $username, string $ip, string $service = 'pppoe', ?string $mac = null)
  * @method static void dispatchSessionDisconnected(string $username, ?string $ip = null, ?string $uptime = null, string $reason = 'manual')
  * @method static VpnManager vpn() // VPN Manager for WireGuard and OpenVPN support
-
+ * @method static BridgeManager bridge() // Bridge Manager for managing Mikrotik bridges
 
  * @see MikrotikManager
  *

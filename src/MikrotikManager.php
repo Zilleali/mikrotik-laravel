@@ -23,6 +23,7 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
 use ZillEAli\MikrotikLaravel\Services\VpnManager;
 use ZillEAli\MikrotikLaravel\Services\WirelessManager; // VPN Manager for WireGuard and OpenVPN support
 use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New SSL connection class for secure API access
+use ZillEAli\MikrotikLaravel\Services\BridgeManager; // New manager for managing bridges and VLANs
 
 /**
  * MikrotikManager
@@ -221,7 +222,7 @@ class MikrotikManager
             ];
         }
 
-        if (! isset($this->config['routers'][$name])) {
+        if (!isset($this->config['routers'][$name])) {
             throw new ConnectionException(
                 "Router '{$name}' not found in config/mikrotik.php routers array."
             );
@@ -462,5 +463,14 @@ class MikrotikManager
     public function vpn(): VpnManager
     {
         return new VpnManager($this->getClient());
+    }
+    /**
+     * Get Bridge manager for the current router.
+     *
+     * @return BridgeManager
+     */
+    public function bridge(): BridgeManager
+    {
+        return new BridgeManager($this->getClient());
     }
 }
