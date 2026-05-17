@@ -28,19 +28,20 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class BridgeManager
 {
-    private const CMD_BRIDGE_PRINT   = '/interface/bridge/print';
-    private const CMD_BRIDGE_ADD     = '/interface/bridge/add';
-    private const CMD_BRIDGE_REMOVE  = '/interface/bridge/remove';
-    private const CMD_PORT_PRINT     = '/interface/bridge/port/print';
-    private const CMD_PORT_ADD       = '/interface/bridge/port/add';
-    private const CMD_PORT_REMOVE    = '/interface/bridge/port/remove';
-    private const CMD_HOST_PRINT     = '/interface/bridge/host/print';
-    private const CMD_FILTER_PRINT   = '/interface/bridge/filter/print';
-    private const CMD_FILTER_ADD     = '/interface/bridge/filter/add';
+    private const CMD_BRIDGE_PRINT = '/interface/bridge/print';
+    private const CMD_BRIDGE_ADD = '/interface/bridge/add';
+    private const CMD_BRIDGE_REMOVE = '/interface/bridge/remove';
+    private const CMD_PORT_PRINT = '/interface/bridge/port/print';
+    private const CMD_PORT_ADD = '/interface/bridge/port/add';
+    private const CMD_PORT_REMOVE = '/interface/bridge/port/remove';
+    private const CMD_HOST_PRINT = '/interface/bridge/host/print';
+    private const CMD_FILTER_PRINT = '/interface/bridge/filter/print';
+    private const CMD_FILTER_ADD = '/interface/bridge/filter/add';
 
     public function __construct(
         protected RouterosClient $client
-    ) {}
+    ) {
+    }
 
     // =========================================================
     // Bridges

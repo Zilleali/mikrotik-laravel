@@ -1,4 +1,4 @@
-## Summary
+# Summary
 
 <!-- What does this PR do? -->
 
@@ -9,14 +9,17 @@
 - [ ] Breaking change
 - [ ] Documentation update
 
-## Manager affected
+## Manager / Component affected
 
-- [ ] RouterosClient
-- [ ] PppoeManager
-- [ ] HotspotManager
-- [ ] QueueManager
-- [ ] FirewallManager
-- [ ] SystemManager
+- [ ] Core (RouterosClient, ConnectionPool, SSL)
+- [ ] PPPoE / Hotspot / Queue
+- [ ] Firewall / Interface / Wireless
+- [ ] System / DHCP / IP Pool
+- [ ] RADIUS / VPN / Bridge
+- [ ] Router Users / Caching
+- [ ] Filament Widgets
+- [ ] Events / Commands
+- [ ] MikrotikManager / Facade
 - [ ] Other: ___
 
 ## Checklist

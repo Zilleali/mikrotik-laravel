@@ -27,7 +27,7 @@ class ActiveSessionsWidget
     {
         try {
             $manager = app(MikrotikManager::class);
-            $pppoe   = count($manager->pppoe()->getActiveSessions());
+            $pppoe = count($manager->pppoe()->getActiveSessions());
             $hotspot = count($manager->hotspot()->getActiveHosts());
 
             return [
