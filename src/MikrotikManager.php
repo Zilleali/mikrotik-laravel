@@ -4,6 +4,7 @@ namespace ZillEAli\MikrotikLaravel;
 
 use Illuminate\Support\Facades\Event;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Connections\RouterosClientSSL;
 use ZillEAli\MikrotikLaravel\Events\RouterConnected;
 use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
@@ -20,9 +21,8 @@ use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 use ZillEAli\MikrotikLaravel\Services\SystemManager;
 use ZillEAli\MikrotikLaravel\Services\VpnManager;
-use ZillEAli\MikrotikLaravel\Services\WirelessManager;
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // VPN Manager for WireGuard and OpenVPN support
-use ZillEAli\MikrotikLaravel\Connections\RouterosClientSSL; // New SSL connection class for secure API access
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New SSL connection class for secure API access
 
 /**
  * MikrotikManager
@@ -221,7 +221,7 @@ class MikrotikManager
             ];
         }
 
-        if (!isset($this->config['routers'][$name])) {
+        if (! isset($this->config['routers'][$name])) {
             throw new ConnectionException(
                 "Router '{$name}' not found in config/mikrotik.php routers array."
             );

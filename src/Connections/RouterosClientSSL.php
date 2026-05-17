@@ -60,10 +60,10 @@ class RouterosClientSSL extends RouterosClient
      */
     public function __construct(
         string  $host,
-        int     $port       = 8729,
-        string  $username   = 'admin',
-        string  $password   = '',
-        int     $timeout    = 10,
+        int     $port = 8729,
+        string  $username = 'admin',
+        string  $password = '',
+        int     $timeout = 10,
         bool    $verifyPeer = false,
         ?string $caCertPath = null,
     ) {
@@ -130,8 +130,8 @@ class RouterosClientSSL extends RouterosClient
     protected function buildSslContext(bool $verifyPeer, ?string $caCertPath): array
     {
         $ssl = [
-            'verify_peer'       => $verifyPeer,
-            'verify_peer_name'  => $verifyPeer,
+            'verify_peer' => $verifyPeer,
+            'verify_peer_name' => $verifyPeer,
             'allow_self_signed' => ! $verifyPeer,
         ];
 
@@ -154,11 +154,11 @@ class RouterosClientSSL extends RouterosClient
     public function getConnectionInfo(): array
     {
         return [
-            'host'        => $this->host,
-            'port'        => $this->port,
-            'username'    => $this->username,
-            'ssl'         => true,
-            'connected'   => $this->connected,
+            'host' => $this->host,
+            'port' => $this->port,
+            'username' => $this->username,
+            'ssl' => true,
+            'connected' => $this->connected,
             'verify_peer' => $this->sslContext['ssl']['verify_peer'] ?? false,
         ];
     }
