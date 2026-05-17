@@ -23,16 +23,16 @@ class RouterHealthWidget
     public function getStats(): array
     {
         try {
-            $manager   = app(MikrotikManager::class);
+            $manager = app(MikrotikManager::class);
             $resources = $manager->system()->getResources();
-            $identity  = $manager->system()->getIdentity();
+            $identity = $manager->system()->getIdentity();
 
-            $cpu      = $resources['cpu-load']    ?? 0;
-            $uptime   = $resources['uptime']      ?? 'N/A';
-            $version  = $resources['version']     ?? 'N/A';
-            $freeMem  = (int) ($resources['free-memory']  ?? 0);
+            $cpu = $resources['cpu-load'] ?? 0;
+            $uptime = $resources['uptime'] ?? 'N/A';
+            $version = $resources['version'] ?? 'N/A';
+            $freeMem = (int) ($resources['free-memory'] ?? 0);
             $totalMem = (int) ($resources['total-memory'] ?? 1);
-            $memPct   = $totalMem > 0
+            $memPct = $totalMem > 0
                 ? round((1 - $freeMem / $totalMem) * 100)
                 : 0;
 
