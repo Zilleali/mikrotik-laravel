@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel;
 
 use Illuminate\Support\Facades\Event;
+use ZillEAli\MikrotikLaravel\Connections\ConnectionPool;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClientSSL;
 use ZillEAli\MikrotikLaravel\Events\RouterConnected;
@@ -10,6 +11,7 @@ use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
+use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
@@ -19,13 +21,10 @@ use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
-use ZillEAli\MikrotikLaravel\Services\SystemManager;
-use ZillEAli\MikrotikLaravel\Services\VpnManager;
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // VPN Manager for WireGuard and OpenVPN support
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New SSL connection class for secure API access
-use ZillEAli\MikrotikLaravel\Services\BridgeManager; // New manager for managing bridges and VLANs
-use ZillEAli\MikrotikLaravel\Connections\ConnectionPool; // New connection pool for efficient connection reuse
-
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New SSL connection class for secure API access
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing bridges and VLANs
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New connection pool for efficient connection reuse
 
 /**
  * MikrotikManager
@@ -107,31 +106,31 @@ class MikrotikManager
             return $this->pool->get($name);
         }
 
-        $cfg    = $this->getRouterConfig($name);
+        $cfg = $this->getRouterConfig($name);
         $useSSL = $cfg['ssl'] ?? $this->config['ssl'] ?? false;
 
         if ($useSSL) {
             $client = new RouterosClientSSL(
                 host:       $cfg['host'],
-                port:       $cfg['port']        ?? 8729,
-                username:   $cfg['username']    ?? 'admin',
-                password:   $cfg['password']    ?? '',
-                timeout:    $cfg['timeout']     ?? 10,
+                port:       $cfg['port'] ?? 8729,
+                username:   $cfg['username'] ?? 'admin',
+                password:   $cfg['password'] ?? '',
+                timeout:    $cfg['timeout'] ?? 10,
                 verifyPeer: $cfg['verify_peer'] ?? false,
                 caCertPath: $cfg['ca_cert_path'] ?? null,
             );
         } else {
             $client = new RouterosClient(
                 host:     $cfg['host'],
-                port:     $cfg['port']     ?? 8728,
+                port:     $cfg['port'] ?? 8728,
                 username: $cfg['username'] ?? 'admin',
                 password: $cfg['password'] ?? '',
-                timeout:  $cfg['timeout']  ?? 10,
+                timeout:  $cfg['timeout'] ?? 10,
             );
         }
 
         $attempts = $this->config['retry_attempts'] ?? 1;
-        $delay    = $this->config['retry_delay']    ?? 1000;
+        $delay = $this->config['retry_delay'] ?? 1000;
 
         $this->connectWithRetry($client, $attempts, $delay, $name, $cfg);
 
@@ -145,7 +144,7 @@ class MikrotikManager
      */
     protected function resolveAndResetRouter(): string
     {
-        $name                = $this->currentRouter;
+        $name = $this->currentRouter;
         $this->currentRouter = 'default';
 
         return $name;
@@ -193,8 +192,8 @@ class MikrotikManager
         }
 
         Event::dispatch(new RouterUnreachable(
-            host:      $cfg['host']     ?? '',
-            port:      $cfg['port']     ?? 8728,
+            host:      $cfg['host'] ?? '',
+            port:      $cfg['port'] ?? 8728,
             router:    $routerName,
             attempts:  $attempts,
             error:     $lastException?->getMessage() ?? '',
@@ -218,11 +217,11 @@ class MikrotikManager
     {
         if ($name === 'default') {
             return [
-                'host'     => $this->config['host']     ?? '192.168.88.1',
-                'port'     => $this->config['port']     ?? 8728,
+                'host' => $this->config['host'] ?? '192.168.88.1',
+                'port' => $this->config['port'] ?? 8728,
                 'username' => $this->config['username'] ?? 'admin',
                 'password' => $this->config['password'] ?? '',
-                'timeout'  => $this->config['timeout']  ?? 10,
+                'timeout' => $this->config['timeout'] ?? 10,
             ];
         }
 

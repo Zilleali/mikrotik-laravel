@@ -32,8 +32,8 @@ class BandwidthChartWidget
             $manager = app(MikrotikManager::class);
             $traffic = $manager->interfaces()->getTraffic($this->interface);
 
-            $tx   = (int) (($traffic['tx-bits-per-second'] ?? 0) / 1_000_000);
-            $rx   = (int) (($traffic['rx-bits-per-second'] ?? 0) / 1_000_000);
+            $tx = (int) (($traffic['tx-bits-per-second'] ?? 0) / 1_000_000);
+            $rx = (int) (($traffic['rx-bits-per-second'] ?? 0) / 1_000_000);
             $time = now()->format('H:i:s');
 
             static::$dataPoints[] = compact('tx', 'rx', 'time');
@@ -42,18 +42,19 @@ class BandwidthChartWidget
                 array_shift(static::$dataPoints);
             }
 
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         return [
             'datasets' => [
                 [
-                    'label'       => 'TX (Mbps)',
-                    'data'        => array_column(static::$dataPoints, 'tx'),
+                    'label' => 'TX (Mbps)',
+                    'data' => array_column(static::$dataPoints, 'tx'),
                     'borderColor' => '#1D9E75',
                 ],
                 [
-                    'label'       => 'RX (Mbps)',
-                    'data'        => array_column(static::$dataPoints, 'rx'),
+                    'label' => 'RX (Mbps)',
+                    'data' => array_column(static::$dataPoints, 'rx'),
                     'borderColor' => '#1F6FEB',
                 ],
             ],

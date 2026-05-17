@@ -5,16 +5,23 @@ use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 
 function makeBridgeClient(array $responses = []): RouterosClient
 {
-    return new class($responses) extends RouterosClient {
-        public function __construct(private array $responses) {
+    return new class ($responses) extends RouterosClient {
+        public function __construct(private array $responses)
+        {
             parent::__construct(host: '127.0.0.1');
         }
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
         }
-        public function send(array $words): array { return []; }
-        public function isConnected(): bool { return true; }
+        public function send(array $words): array
+        {
+            return [];
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 }
 
@@ -37,7 +44,7 @@ it('returns all bridges', function () {
 });
 
 it('returns empty array when no bridges exist', function () {
-    $client  = makeBridgeClient(['/interface/bridge/print' => []]);
+    $client = makeBridgeClient(['/interface/bridge/print' => []]);
     $manager = new BridgeManager($client);
 
     expect($manager->getBridges())->toBeEmpty();
@@ -53,14 +60,14 @@ it('returns single bridge by name', function () {
     ]);
 
     $manager = new BridgeManager($client);
-    $bridge  = $manager->getBridge('bridge1');
+    $bridge = $manager->getBridge('bridge1');
 
     expect($bridge)->not->toBeNull()
         ->and($bridge['name'])->toBe('bridge1');
 });
 
 it('returns null when bridge not found', function () {
-    $client  = makeBridgeClient(['/interface/bridge/print' => []]);
+    $client = makeBridgeClient(['/interface/bridge/print' => []]);
     $manager = new BridgeManager($client);
 
     expect($manager->getBridge('nonexistent'))->toBeNull();
@@ -78,7 +85,7 @@ it('returns all bridge ports', function () {
     ]);
 
     $manager = new BridgeManager($client);
-    $ports   = $manager->getBridgePorts();
+    $ports = $manager->getBridgePorts();
 
     expect($ports)->toHaveCount(3)
         ->and($ports[0]['interface'])->toBe('ether2');
@@ -96,7 +103,7 @@ it('returns ports for specific bridge', function () {
     ]);
 
     $manager = new BridgeManager($client);
-    $ports   = $manager->getBridgePortsByBridge('bridge1');
+    $ports = $manager->getBridgePortsByBridge('bridge1');
 
     expect($ports)->toHaveCount(2)
         ->and($ports[0]['bridge'])->toBe('bridge1')
@@ -106,11 +113,11 @@ it('returns ports for specific bridge', function () {
 // ─── addBridge ────────────────────────────────────────────────
 
 it('creates bridge without throwing', function () {
-    $client  = makeBridgeClient();
+    $client = makeBridgeClient();
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->addBridge([
-        'name'    => 'bridge3',
+        'name' => 'bridge3',
         'comment' => 'test bridge',
     ]))->not->toThrow(\Exception::class);
 });
@@ -131,7 +138,7 @@ it('removes bridge without throwing', function () {
 });
 
 it('does not throw when removing non-existent bridge', function () {
-    $client  = makeBridgeClient(['/interface/bridge/print' => []]);
+    $client = makeBridgeClient(['/interface/bridge/print' => []]);
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->removeBridge('ghost'))
@@ -141,11 +148,11 @@ it('does not throw when removing non-existent bridge', function () {
 // ─── addBridgePort ────────────────────────────────────────────
 
 it('adds bridge port without throwing', function () {
-    $client  = makeBridgeClient();
+    $client = makeBridgeClient();
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->addBridgePort([
-        'bridge'    => 'bridge1',
+        'bridge' => 'bridge1',
         'interface' => 'ether5',
     ]))->not->toThrow(\Exception::class);
 });
@@ -176,7 +183,7 @@ it('returns bridge host table', function () {
     ]);
 
     $manager = new BridgeManager($client);
-    $hosts   = $manager->getBridgeHosts();
+    $hosts = $manager->getBridgeHosts();
 
     expect($hosts)->toHaveCount(2)
         ->and($hosts[0]['mac-address'])->toBe('AA:BB:CC:DD:EE:01');
@@ -202,11 +209,11 @@ it('returns bridge filter rules', function () {
 // ─── addBridgeFilter ──────────────────────────────────────────
 
 it('adds bridge filter without throwing', function () {
-    $client  = makeBridgeClient();
+    $client = makeBridgeClient();
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->addBridgeFilter([
-        'chain'  => 'forward',
+        'chain' => 'forward',
         'action' => 'drop',
         'mac-protocol' => 'ip',
     ]))->not->toThrow(\Exception::class);
