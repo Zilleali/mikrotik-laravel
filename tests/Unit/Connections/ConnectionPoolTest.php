@@ -2,7 +2,6 @@
 
 use ZillEAli\MikrotikLaravel\Connections\ConnectionPool;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
-use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
 
 // ─── Class exists ─────────────────────────────────────────────
 
@@ -21,10 +20,16 @@ it('creates ConnectionPool with empty connections', function () {
 // ─── add / get ────────────────────────────────────────────────
 
 it('stores and retrieves a client by name', function () {
-    $pool   = new ConnectionPool();
-    $client = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $pool = new ConnectionPool();
+    $client = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
     $pool->add('main', $client);
@@ -41,10 +46,16 @@ it('returns null for unknown router name', function () {
 // ─── has ──────────────────────────────────────────────────────
 
 it('returns true when connection exists', function () {
-    $pool   = new ConnectionPool();
-    $client = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $pool = new ConnectionPool();
+    $client = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
     $pool->add('main', $client);
@@ -61,10 +72,16 @@ it('returns false when connection does not exist', function () {
 // ─── isAlive ──────────────────────────────────────────────────
 
 it('returns true when connection is alive', function () {
-    $pool   = new ConnectionPool();
-    $client = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $pool = new ConnectionPool();
+    $client = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
     $pool->add('main', $client);
@@ -73,10 +90,16 @@ it('returns true when connection is alive', function () {
 });
 
 it('returns false when connection is dead', function () {
-    $pool   = new ConnectionPool();
-    $client = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return false; }
+    $pool = new ConnectionPool();
+    $client = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return false;
+        }
     };
 
     $pool->add('main', $client);
@@ -93,10 +116,16 @@ it('returns false for non-existent connection', function () {
 // ─── remove ───────────────────────────────────────────────────
 
 it('removes a connection by name', function () {
-    $pool   = new ConnectionPool();
-    $client = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $pool = new ConnectionPool();
+    $client = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
     $pool->add('main', $client);
@@ -118,14 +147,26 @@ it('does not throw when removing non-existent connection', function () {
 it('flushes all connections', function () {
     $pool = new ConnectionPool();
 
-    $client1 = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $client1 = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
-    $client2 = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.2'); }
-        public function isConnected(): bool { return true; }
+    $client2 = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.2');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
     $pool->add('main', $client1);
@@ -140,14 +181,20 @@ it('flushes all connections', function () {
 it('returns correct connection count', function () {
     $pool = new ConnectionPool();
 
-    $makeClient = fn (string $host) => new class($host) extends RouterosClient {
-        public function __construct(string $h) { parent::__construct(host: $h); }
-        public function isConnected(): bool { return true; }
+    $makeClient = fn (string $host) => new class ($host) extends RouterosClient {
+        public function __construct(string $h)
+        {
+            parent::__construct(host: $h);
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
-    $pool->add('main',   $makeClient('127.0.0.1'));
+    $pool->add('main', $makeClient('127.0.0.1'));
     $pool->add('branch', $makeClient('127.0.0.2'));
-    $pool->add('edge',   $makeClient('127.0.0.3'));
+    $pool->add('edge', $makeClient('127.0.0.3'));
 
     expect($pool->count())->toBe(3);
 });
@@ -157,12 +204,18 @@ it('returns correct connection count', function () {
 it('returns all connection names', function () {
     $pool = new ConnectionPool();
 
-    $makeClient = fn (string $host) => new class($host) extends RouterosClient {
-        public function __construct(string $h) { parent::__construct(host: $h); }
-        public function isConnected(): bool { return true; }
+    $makeClient = fn (string $host) => new class ($host) extends RouterosClient {
+        public function __construct(string $h)
+        {
+            parent::__construct(host: $h);
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
-    $pool->add('main',   $makeClient('127.0.0.1'));
+    $pool->add('main', $makeClient('127.0.0.1'));
     $pool->add('branch', $makeClient('127.0.0.2'));
 
     $names = $pool->getNames();
@@ -177,17 +230,29 @@ it('returns all connection names', function () {
 it('returns only alive connections', function () {
     $pool = new ConnectionPool();
 
-    $alive = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $alive = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
-    $dead = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.2'); }
-        public function isConnected(): bool { return false; }
+    $dead = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.2');
+        }
+        public function isConnected(): bool
+        {
+            return false;
+        }
     };
 
-    $pool->add('main',   $alive);
+    $pool->add('main', $alive);
     $pool->add('branch', $dead);
 
     $aliveConnections = $pool->getAliveConnections();
@@ -202,17 +267,29 @@ it('returns only alive connections', function () {
 it('removes dead connections and keeps alive ones', function () {
     $pool = new ConnectionPool();
 
-    $alive = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.1'); }
-        public function isConnected(): bool { return true; }
+    $alive = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.1');
+        }
+        public function isConnected(): bool
+        {
+            return true;
+        }
     };
 
-    $dead = new class extends RouterosClient {
-        public function __construct() { parent::__construct(host: '127.0.0.2'); }
-        public function isConnected(): bool { return false; }
+    $dead = new class () extends RouterosClient {
+        public function __construct()
+        {
+            parent::__construct(host: '127.0.0.2');
+        }
+        public function isConnected(): bool
+        {
+            return false;
+        }
     };
 
-    $pool->add('main',   $alive);
+    $pool->add('main', $alive);
     $pool->add('branch', $dead);
     $pool->pruneDeadConnections();
 
