@@ -23,12 +23,12 @@ class InterfaceTableWidget
     public function getInterfaces(): array
     {
         try {
-            $manager    = app(MikrotikManager::class);
+            $manager = app(MikrotikManager::class);
             $interfaces = $manager->interfaces()->getInterfaces();
 
             return array_map(function ($iface) {
                 return array_merge($iface, [
-                    'running'  => ($iface['running']  ?? 'false') === 'true',
+                    'running' => ($iface['running'] ?? 'false') === 'true',
                     'disabled' => ($iface['disabled'] ?? 'false') === 'true',
                 ]);
             }, $interfaces);
