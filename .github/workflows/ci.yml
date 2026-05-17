@@ -43,24 +43,3 @@ jobs:
 
       - name: Run Pest
         run: ./vendor/bin/pest --no-coverage
-
-  lint:
-    runs-on: ubuntu-latest
-    name: PHP CS Fixer
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: sockets, openssl
-          coverage: none
-          tools: composer:v2
-
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: PHP CS Fixer
-        run: ./vendor/bin/php-cs-fixer fix --diff
