@@ -4,6 +4,7 @@ namespace ZillEAli\MikrotikLaravel;
 
 use Illuminate\Support\Facades\Event;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Connections\RouterosClientSSL;
 use ZillEAli\MikrotikLaravel\Events\RouterConnected;
 use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
@@ -20,8 +21,8 @@ use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 use ZillEAli\MikrotikLaravel\Services\SystemManager;
 use ZillEAli\MikrotikLaravel\Services\VpnManager;
-use ZillEAli\MikrotikLaravel\Services\WirelessManager;
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New SSL connection class for secure API access
 
 /**
  * MikrotikManager
@@ -98,7 +99,7 @@ class MikrotikManager
      */
     protected function getClient(): RouterosClient
     {
-        $name = $this->resolveAndResetRouter(); // ← alag method
+        $name = $this->resolveAndResetRouter();
 
         if (
             isset($this->connections[$name]) &&
@@ -109,18 +110,33 @@ class MikrotikManager
 
         $cfg = $this->getRouterConfig($name);
 
-        $client = new RouterosClient(
-            host: $cfg['host'],
-            port: $cfg['port'] ?? 8728,
-            username: $cfg['username'] ?? 'admin',
-            password: $cfg['password'] ?? '',
-            timeout: $cfg['timeout'] ?? 10,
-        );
+        // SSL ya plain — config se decide hoga
+        $useSSL = $cfg['ssl'] ?? $this->config['ssl'] ?? false;
+
+        if ($useSSL) {
+            $client = new RouterosClientSSL(
+                host: $cfg['host'],
+                port: $cfg['port'] ?? 8729,
+                username: $cfg['username'] ?? 'admin',
+                password: $cfg['password'] ?? '',
+                timeout: $cfg['timeout'] ?? 10,
+                verifyPeer: $cfg['verify_peer'] ?? false,
+                caCertPath: $cfg['ca_cert_path'] ?? null,
+            );
+        } else {
+            $client = new RouterosClient(
+                host: $cfg['host'],
+                port: $cfg['port'] ?? 8728,
+                username: $cfg['username'] ?? 'admin',
+                password: $cfg['password'] ?? '',
+                timeout: $cfg['timeout'] ?? 10,
+            );
+        }
 
         $attempts = $this->config['retry_attempts'] ?? 1;
         $delay = $this->config['retry_delay'] ?? 1000;
 
-        $this->connectWithRetry($client, $attempts, $delay, $name, $cfg); //
+        $this->connectWithRetry($client, $attempts, $delay, $name, $cfg);
 
         $this->connections[$name] = $client;
 
