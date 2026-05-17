@@ -65,6 +65,12 @@ class MikrotikServiceProvider extends ServiceProvider
                 MikrotikMonitor::class,
             ]);
         }
+        // Filament widgets publish — only if Filament installed
+        if (class_exists(\Filament\FilamentServiceProvider::class)) {
+            $this->publishes([
+                __DIR__ . '/../resources/views/filament' => resource_path('views/vendor/mikrotik-laravel/filament'),
+            ], 'mikrotik-filament-views');
+        }
     }
 
     /**
@@ -79,4 +85,5 @@ class MikrotikServiceProvider extends ServiceProvider
             'mikrotik',
         ];
     }
+
 }
