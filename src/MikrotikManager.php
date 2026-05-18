@@ -14,19 +14,20 @@ use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
 use ZillEAli\MikrotikLaravel\Services\ArpManager;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
+use ZillEAli\MikrotikLaravel\Services\DnsManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
 use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
-use ZillEAli\MikrotikLaravel\Services\QueueManager;
-use ZillEAli\MikrotikLaravel\Services\RadiusManager; // VPN Manager for WireGuard and OpenVPN support
-use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New SSL connection class for secure API access
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for managing bridges and VLANs
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New connection pool for efficient connection reuse
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for IP address management on interfaces
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for ARP table management
+use ZillEAli\MikrotikLaravel\Services\QueueManager; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Services\RadiusManager; // New SSL connection class for secure API access
+use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New manager for managing bridges and VLANs
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New connection pool for efficient connection reuse
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for IP address management on interfaces
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for ARP table management
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for DNS settings and static entries
 
 /**
  * MikrotikManager
@@ -429,5 +430,11 @@ class MikrotikManager
     public function arp(): ArpManager
     {
         return new ArpManager($this->getClient());
+    }
+
+    /** @return DnsManager */
+    public function dns(): DnsManager
+    {
+        return new DnsManager($this->getClient());
     }
 }
