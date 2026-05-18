@@ -39,7 +39,7 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static RouteManager routes() // Route Manager for managing static routes and routing table on Mikrotik devices
  * @method static NtpManager ntp() // NTP Manager for managing NTP client settings and status on Mikrotik devices
  * @method static ScriptManager scripts() // Script Manager for managing scripts and schedulers on Mikrotik devices
- *
+ * @method static SyslogManager syslog() // Syslog Manager for managing syslog settings and logs on Mikrotik devices
  *
  *
  * @see MikrotikManager
