@@ -27,12 +27,14 @@ use ZillEAli\MikrotikLaravel\Services\RadiusManager; // New manager for managing
 use ZillEAli\MikrotikLaravel\Services\RouteManager; // New connection pool for efficient connection reuse
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New manager for IP address management on interfaces
 use ZillEAli\MikrotikLaravel\Services\ScriptManager; // New manager for ARP table management
-use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New manager for DNS settings and static entries
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for routing table management and policy routing
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for NTP client configuration and status monitoring
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing scripts and schedulers on Mikrotik devices
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for managing syslog settings and log entries on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Services\SessionMonitor; // New manager for DNS settings and static entries
+use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New manager for routing table management and policy routing
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for NTP client configuration and status monitoring
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for managing scripts and schedulers on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing syslog settings and log entries on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for real-time monitoring of active sessions across PPPoE and Hotspot services
 
+// New manager for real-time monitoring of active sessions across PPPoE and Hotspot services
 // New manager for managing scripts and scheduler on Mikrotik devices
 
 
@@ -466,5 +468,10 @@ class MikrotikManager
     public function syslog(): SyslogManager
     {
         return new SyslogManager($this->getClient());
+    }
+    /** @return SessionMonitor */
+    public function sessionMonitor(): SessionMonitor
+    {
+        return new SessionMonitor($this->getClient());
     }
 }
