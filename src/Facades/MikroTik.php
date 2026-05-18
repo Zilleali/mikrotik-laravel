@@ -33,7 +33,9 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static void dispatchSessionDisconnected(string $username, ?string $ip = null, ?string $uptime = null, string $reason = 'manual')
  * @method static VpnManager vpn() // VPN Manager for WireGuard and OpenVPN support
  * @method static BridgeManager bridge() // Bridge Manager for managing Mikrotik bridges
-
+ * @method static IpAddressManager ipAddress() // IP Address Manager for managing IP addresses on Mikrotik devices
+ *
+ *
  * @see MikrotikManager
  *
  * @package ZillEAli\MikrotikLaravel\Facades
