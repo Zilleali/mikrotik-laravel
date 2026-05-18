@@ -40,6 +40,7 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static NtpManager ntp() // NTP Manager for managing NTP client settings and status on Mikrotik devices
  * @method static ScriptManager scripts() // Script Manager for managing scripts and schedulers on Mikrotik devices
  * @method static SyslogManager syslog() // Syslog Manager for managing syslog settings and logs on Mikrotik devices
+ * @method static UsageTracker usageTracker() // Usage Tracker for monitoring real-time traffic and session usage on Mikrotik devices
  * @method static SessionMonitor sessionMonitor() // Session Monitor for real-time monitoring of active sessions on Mikrotik devices
  *
  * @see MikrotikManager
