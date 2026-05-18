@@ -25,6 +25,9 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager; // VPN Manager for WireGuar
 use ZillEAli\MikrotikLaravel\Services\VpnManager; // New SSL connection class for secure API access
 use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing bridges and VLANs
 use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New connection pool for efficient connection reuse
+use ZillEAli\MikrotikLaravel\Services\IpAddressManager; // New manager for IP address management on interfaces
+
+
 
 /**
  * MikrotikManager
@@ -413,5 +416,13 @@ class MikrotikManager
             uptime:   $uptime,
             reason:   $reason,
         ));
+    }
+    // ========================================================
+    // New Services     
+    // =========================================================
+    /** @return IpAddressManager */
+    public function ipAddresses(): IpAddressManager
+    {
+        return new IpAddressManager($this->getClient());
     }
 }
