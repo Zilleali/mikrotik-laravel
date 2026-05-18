@@ -35,6 +35,12 @@ use ZillEAli\MikrotikLaravel\Services\SystemManager;
  * @method static BridgeManager bridge() // Bridge Manager for managing Mikrotik bridges
  * @method static IpAddressManager ipAddress() // IP Address Manager for managing IP addresses on Mikrotik devices
  * @method static ArpManager arp() // ARP Manager for managing ARP entries on Mikrotik devices
+ *  @method static DnsManager dns() // DNS Manager for managing DNS settings and static entries on Mikrotik devices
+ *
+ *
+ *
+ *
+ *
  *
  * @see MikrotikManager
  *
