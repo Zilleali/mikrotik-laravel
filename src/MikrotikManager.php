@@ -33,6 +33,16 @@ use ZillEAli\MikrotikLaravel\Services\UsageTracker; // New manager for NTP clien
 use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for managing scripts and schedulers on Mikrotik devices
 use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing syslog settings and log entries on Mikrotik devices
 use ZillEAli\MikrotikLaravel\Support\CachingProxy;
+use ZillEAli\MikrotikLaravel\Services\SessionMonitor; // New manager for DNS settings and static entries
+use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New manager for routing table management and policy routing
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for NTP client configuration and status monitoring
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for managing scripts and schedulers on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing syslog settings and log entries on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for real-time monitoring of active sessions across PPPoE and Hotspot services
+
+// New manager for real-time monitoring of active sessions across PPPoE and Hotspot services
+// New manager for managing scripts and scheduler on Mikrotik devices
+
 
 /**
  * MikrotikManager
@@ -470,5 +480,9 @@ class MikrotikManager
     public function usageTracker(): UsageTracker
     {
         return new UsageTracker($this->getClient());
+    /** @return SessionMonitor */
+    public function sessionMonitor(): SessionMonitor
+    {
+        return new SessionMonitor($this->getClient());
     }
 }
