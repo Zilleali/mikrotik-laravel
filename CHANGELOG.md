@@ -6,10 +6,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.2.0] — 2026-05-18
+
+### Added (0.2.0)
+
+#### SSL Connection
+
+- `RouterosClientSSL` — TLS encrypted connection via port 8729
+- Self-signed certificate support — ISP standard
+- `verifyPeer` option for strict CA verification
+- Auto-selected from config: `MIKROTIK_SSL=true`
+- `getConnectionInfo()` — returns SSL status
+
+#### Bridge Manager
+
+- `getBridges()` / `getBridge($name)`
+- `addBridge($data)` / `removeBridge($name)`
+- `getBridgePorts()` / `getBridgePortsByBridge($bridge)`
+- `addBridgePort($data)` / `removeBridgePort($interface)`
+- `getPortCount($bridge)`
+- `getBridgeHosts()` / `getBridgeHostsByBridge($bridge)`
+- `getBridgeFilters()` / `addBridgeFilter($data)`
+
+#### ConnectionPool
+
+- Persistent `RouterosClient` connections keyed by router name
+- `isAlive($name)` — health check before reuse
+- `pruneDeadConnections()` — cleanup dropped connections
+- `getAliveConnections()` — list active connections
+- `flush()` — disconnect all
+- `MikrotikManager` refactored to use pool instead of plain array
+
+#### Widget Stubs
+
+- Framework-agnostic widget data classes — no UI dependency
+- `ActiveSessionsWidget` — PPPoE + Hotspot session data
+- `RouterHealthWidget` — CPU, RAM, uptime, version data
+- `BandwidthChartWidget` — TX/RX traffic data
+- `InterfaceTableWidget` — interface status data
+- Extend in your own dashboard implementation
 
 ## [1.0.0] — 2026-05-16
 
-### Added
+### Added (1.0.0)
 
 #### Core
 
@@ -69,7 +108,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] — 2026-05-14
 
-### Added
+### Added (0.1.0)
 
 - Initial release
 - `RouterosClient` core TCP client
