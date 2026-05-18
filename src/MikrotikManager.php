@@ -11,23 +11,22 @@ use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
+use ZillEAli\MikrotikLaravel\Services\ArpManager;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
+use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
 use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
-use ZillEAli\MikrotikLaravel\Services\RadiusManager;
-use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // VPN Manager for WireGuard and OpenVPN support
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New SSL connection class for secure API access
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing bridges and VLANs
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New connection pool for efficient connection reuse
-use ZillEAli\MikrotikLaravel\Services\IpAddressManager; // New manager for IP address management on interfaces
-
-
+use ZillEAli\MikrotikLaravel\Services\RadiusManager; // VPN Manager for WireGuard and OpenVPN support
+use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New SSL connection class for secure API access
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for managing bridges and VLANs
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New connection pool for efficient connection reuse
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for IP address management on interfaces
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for ARP table management
 
 /**
  * MikrotikManager
@@ -418,11 +417,17 @@ class MikrotikManager
         ));
     }
     // ========================================================
-    // New Services     
+    // New Services
     // =========================================================
     /** @return IpAddressManager */
     public function ipAddresses(): IpAddressManager
     {
         return new IpAddressManager($this->getClient());
+    }
+
+    /** @return ArpManager */
+    public function arp(): ArpManager
+    {
+        return new ArpManager($this->getClient());
     }
 }
