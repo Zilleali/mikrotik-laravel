@@ -29,12 +29,10 @@ use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New manager for IP a
 use ZillEAli\MikrotikLaravel\Services\ScriptManager; // New manager for ARP table management
 use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New manager for DNS settings and static entries
 use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for routing table management and policy routing
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for NTP client configuration and status monitoring
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing scripts and schedulers on Mikrotik devices
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for managing syslog settings and log entries on Mikrotik devices
-
-// New manager for managing scripts and scheduler on Mikrotik devices
-
+use ZillEAli\MikrotikLaravel\Services\UsageTracker; // New manager for NTP client configuration and status monitoring
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for managing scripts and schedulers on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing syslog settings and log entries on Mikrotik devices
+use ZillEAli\MikrotikLaravel\Support\CachingProxy;
 
 /**
  * MikrotikManager
@@ -466,5 +464,11 @@ class MikrotikManager
     public function syslog(): SyslogManager
     {
         return new SyslogManager($this->getClient());
+    }
+
+    /** @return UsageTracker */
+    public function usageTracker(): UsageTracker
+    {
+        return new UsageTracker($this->getClient());
     }
 }
