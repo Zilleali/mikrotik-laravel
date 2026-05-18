@@ -31,6 +31,9 @@ use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for DNS setting
 use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for routing table management and policy routing
 use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for NTP client configuration and status monitoring
 
+// New manager for managing scripts and scheduler on Mikrotik devices
+
+
 /**
  * MikrotikManager
  *
@@ -451,4 +454,10 @@ class MikrotikManager
     {
         return new NtpManager($this->getClient());
     }
+
+    /** @return ScriptManager */
+public function scripts(): ScriptManager
+{
+    return new ScriptManager($this->getClient());
+}
 }
