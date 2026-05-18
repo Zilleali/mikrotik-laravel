@@ -23,11 +23,12 @@ use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager; // VPN Manager for WireGuard and OpenVPN support
 use ZillEAli\MikrotikLaravel\Services\RadiusManager; // New SSL connection class for secure API access
-use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New manager for managing bridges and VLANs
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // New connection pool for efficient connection reuse
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for IP address management on interfaces
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for ARP table management
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for DNS settings and static entries
+use ZillEAli\MikrotikLaravel\Services\RouteManager; // New manager for managing bridges and VLANs
+use ZillEAli\MikrotikLaravel\Services\RouterUserManager; // New connection pool for efficient connection reuse
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New manager for IP address management on interfaces
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New manager for ARP table management
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for DNS settings and static entries
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New manager for routing table management and policy routing
 
 /**
  * MikrotikManager
@@ -436,5 +437,11 @@ class MikrotikManager
     public function dns(): DnsManager
     {
         return new DnsManager($this->getClient());
+    }
+
+    /** @return RouteManager */
+    public function routes(): RouteManager
+    {
+        return new RouteManager($this->getClient());
     }
 }
