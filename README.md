@@ -35,16 +35,27 @@
 
 ## Features
 
-- **PPPoE Management** — secrets, profiles, active sessions, bulk operations
+- **PPPoE Management** — secrets, profiles, sessions, bulk operations
 - **Hotspot Management** — users, profiles, active hosts, voucher generation
-- **Queue Management** — simple queues, tree queues, bulk bandwidth limits
+- **Queue Management** — simple/tree queues, bulk bandwidth limits
 - **Firewall Management** — filter rules, NAT, mangle, address lists
 - **System Management** — resources, health, logs, ping, reboot
+- **Interface Management** — traffic monitoring, VLANs, enable/disable
+- **DHCP Management** — leases, servers, static assignments
+- **Wireless Management** — registration table, access list, client count
+- **IP Pool Management** — address ranges, usage tracking
+- **RADIUS Management** — servers, incoming CoA config
+- **Router User Management** — Winbox/SSH/API users, groups
+- **VPN Management** — WireGuard peers, L2TP/PPTP sessions
+- **Bridge Management** — bridges, ports, host table, L2 filters
+- **SSL Connection** — TLS encrypted API connection (port 8729)
+- **ConnectionPool** — persistent connections, auto-reconnect
+- **Widget Data Classes** — ready-to-use data providers for dashboards
 - **Multi-Router Support** — manage multiple routers from one app
-- **Laravel Facade** — clean `MikroTik::pppoe()->getSecrets()` syntax
-- **Auto-disconnect** — socket cleanup via destructor, no leaks
-- **RouterOS v6 + v7** — supports both plain and MD5 challenge-response login
-- **Filament v3 Widgets** — drop-in dashboard widgets _(coming in v0.3.0)_
+- **Caching Layer** — reduce router API load automatically
+- **Retry Mechanism** — configurable attempts + delay
+- **Laravel Events** — SessionCreated, SessionDisconnected, RouterUnreachable
+- **Artisan Commands** — mikrotik:ping, mikrotik:sync, mikrotik:monitor
 
 ## Available Managers
 
@@ -62,8 +73,35 @@
 | RadiusManager | `MikroTik::radius()` | RADIUS servers, incoming CoA |
 | RouterUserManager | `MikroTik::routerUsers()` | Router users, groups, sessions |
 | VpnManager | `MikroTik::vpn()` | WireGuard, L2TP, PPTP |
+| BridgeManager | `MikroTik::bridge()` | Bridges, ports, host table, filters |
 
 ---
+
+## SSL Connection
+
+For production ISPs — enable TLS encrypted API connection:
+
+```env
+MIKROTIK_SSL=true
+MIKROTIK_SSL_VERIFY=false
+```
+
+```php
+// Auto-selected from config
+MikroTik::pppoe()->getActiveSessions(); // uses SSL if configured
+
+// Manual
+$client = new RouterosClientSSL(
+    host:       '192.168.88.1',
+    verifyPeer: false, // accept self-signed cert
+);
+```
+
+Enable API-SSL on router:
+
+```text
+IP → Services → api-ssl → enabled
+```
 
 ## Requirements
 
