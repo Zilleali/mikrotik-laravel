@@ -11,20 +11,29 @@ use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
+use ZillEAli\MikrotikLaravel\Services\ArpManager;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
+use ZillEAli\MikrotikLaravel\Services\DnsManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
+use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
 use ZillEAli\MikrotikLaravel\Services\IpPoolManager;
+use ZillEAli\MikrotikLaravel\Services\NtpManager;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 use ZillEAli\MikrotikLaravel\Services\RadiusManager;
+use ZillEAli\MikrotikLaravel\Services\RouteManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // VPN Manager for WireGuard and OpenVPN support
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New SSL connection class for secure API access
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New manager for managing bridges and VLANs
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // New connection pool for efficient connection reuse
+use ZillEAli\MikrotikLaravel\Services\ScriptManager;
+use ZillEAli\MikrotikLaravel\Services\SessionMonitor; // New service for monitoring active PPPoE and Hotspot sessions in real-time
+use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New service for managing system logs, log rules, and remote logging
+use ZillEAli\MikrotikLaravel\Services\SystemManager; // New service for managing system settings, clock, users, and more
+use ZillEAli\MikrotikLaravel\Services\UsageTracker; // New service for tracking bandwidth usage per IP/interface in real-time
+use ZillEAli\MikrotikLaravel\Services\VpnManager; // New service for managing VPN tunnels (IPsec, OpenVPN, WireGuard)
+use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New service for managing wireless interfaces and settings
+use ZillEAli\MikrotikLaravel\Support\CachingProxy; // For wrapping managers with caching layer
 
 /**
  * MikrotikManager
@@ -413,5 +422,59 @@ class MikrotikManager
             uptime:   $uptime,
             reason:   $reason,
         ));
+    }
+    // ========================================================
+    // New Services
+    // =========================================================
+    /** @return IpAddressManager */
+    public function ipAddresses(): IpAddressManager
+    {
+        return new IpAddressManager($this->getClient());
+    }
+
+    /** @return ArpManager */
+    public function arp(): ArpManager
+    {
+        return new ArpManager($this->getClient());
+    }
+
+    /** @return DnsManager */
+    public function dns(): DnsManager
+    {
+        return new DnsManager($this->getClient());
+    }
+
+    /** @return RouteManager */
+    public function routes(): RouteManager
+    {
+        return new RouteManager($this->getClient());
+    }
+
+    /** @return NtpManager */
+    public function ntp(): NtpManager
+    {
+        return new NtpManager($this->getClient());
+    }
+
+    /** @return ScriptManager */
+    public function scripts(): ScriptManager
+    {
+        return new ScriptManager($this->getClient());
+    }
+    /** @return SyslogManager */
+    public function syslog(): SyslogManager
+    {
+        return new SyslogManager($this->getClient());
+    }
+
+    /** @return UsageTracker */
+    public function usageTracker(): UsageTracker
+    {
+        return new UsageTracker($this->getClient());
+    }
+    /** @return SessionMonitor */
+    public function sessionMonitor(): SessionMonitor
+    {
+        return new SessionMonitor($this->getClient());
     }
 }
