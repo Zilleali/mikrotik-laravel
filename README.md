@@ -3,13 +3,29 @@
 [![Tests](https://github.com/Zilleali/mikrotik-laravel/actions/workflows/ci.yml/badge.svg)](https://github.com/Zilleali/mikrotik-laravel/actions)
 [![Packagist](https://img.shields.io/packagist/v/zilleali/mikrotik-laravel)](https://packagist.org/packages/zilleali/mikrotik-laravel)
 [![PHP](https://img.shields.io/packagist/php-v/zilleali/mikrotik-laravel)](https://packagist.org/packages/zilleali/mikrotik-laravel)
-[![License](https://img.shields.io/github/license/Zilleali/mikrotik-laravel)](https://github.com/Zilleali/mikrotik-laravel/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/Zilleali/mikrotik-laravel)](LICENSE)
 [![MTCNA](https://img.shields.io/badge/MTCNA-Certified-009AC7)](https://zilleali.com)
+[![Wiki](https://img.shields.io/badge/Wiki-Documentation-blue)](https://github.com/Zilleali/mikrotik-laravel/wiki)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FZilleali%2Fmikrotik-laravel&label=Visitors&labelColor=%23555555&countColor=%231D9E75&style=flat)
 
 > **MikroTik RouterOS API for Laravel** — Manage PPPoE, Hotspot, Queues, Firewall & System health from any Laravel application. Built by an [MTCNA-certified](https://zilleali.com) ISP engineer.
 
 ---
+
+## Documentation
+
+📖 **[Full Documentation — GitHub Wiki](https://github.com/Zilleali/mikrotik-laravel/wiki)**
+
+| Page | Link |
+|---|---|
+| Getting Started | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Getting-Started) |
+| Managers Reference | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Managers-Reference) |
+| Configuration | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Configuration) |
+| Multi-Router Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Multi-Router-Setup) |
+| SSL Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/SSL-Setup) |
+| Changelog | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Changelog) |
+
+
 
 ## Table of Contents
 
@@ -59,21 +75,31 @@
 
 ## Available Managers
 
-| Manager | Facade Method | Description |
+| Manager | Facade Method | Since |
 |---|---|---|
-| PppoeManager | `MikroTik::pppoe()` | PPPoE secrets, profiles, sessions |
-| HotspotManager | `MikroTik::hotspot()` | Hotspot users, vouchers, active hosts |
-| QueueManager | `MikroTik::queue()` | Simple/tree queues, bulk limits |
-| FirewallManager | `MikroTik::firewall()` | Filter, NAT, mangle, address lists |
-| SystemManager | `MikroTik::system()` | Resources, health, logs, ping |
-| InterfaceManager | `MikroTik::interfaces()` | Interfaces, traffic, VLANs |
-| DhcpManager | `MikroTik::dhcp()` | Leases, servers |
-| WirelessManager | `MikroTik::wireless()` | Registration table, access list |
-| IpPoolManager | `MikroTik::ipPool()` | IP pools, used addresses |
-| RadiusManager | `MikroTik::radius()` | RADIUS servers, incoming CoA |
-| RouterUserManager | `MikroTik::routerUsers()` | Router users, groups, sessions |
-| VpnManager | `MikroTik::vpn()` | WireGuard, L2TP, PPTP |
-| BridgeManager | `MikroTik::bridge()` | Bridges, ports, host table, filters |
+| PppoeManager | `MikroTik::pppoe()` | v1.0.0 |
+| HotspotManager | `MikroTik::hotspot()` | v1.0.0 |
+| QueueManager | `MikroTik::queue()` | v1.0.0 |
+| FirewallManager | `MikroTik::firewall()` | v1.0.0 |
+| SystemManager | `MikroTik::system()` | v1.0.0 |
+| InterfaceManager | `MikroTik::interfaces()` | v1.0.0 |
+| DhcpManager | `MikroTik::dhcp()` | v1.0.0 |
+| WirelessManager | `MikroTik::wireless()` | v1.0.0 |
+| IpPoolManager | `MikroTik::ipPool()` | v1.0.0 |
+| RadiusManager | `MikroTik::radius()` | v1.0.0 |
+| RouterUserManager | `MikroTik::routerUsers()` | v1.0.0 |
+| VpnManager | `MikroTik::vpn()` | v1.0.0 |
+| BridgeManager | `MikroTik::bridge()` | v1.1.0 |
+| IpAddressManager | `MikroTik::ipAddress()` | v1.2.0 |
+| ArpManager | `MikroTik::arp()` | v1.2.0 |
+| DnsManager | `MikroTik::dns()` | v1.2.0 |
+| RouteManager | `MikroTik::routes()` | v1.2.0 |
+| NtpManager | `MikroTik::ntp()` | v1.2.0 |
+| ScriptManager | `MikroTik::scripts()` | v1.2.0 |
+| SyslogManager | `MikroTik::syslog()` | v1.2.0 |
+| SessionMonitor | `MikroTik::sessionMonitor()` | v1.2.0 |
+| UsageTracker | `MikroTik::usageTracker()` | v1.2.0 |
+| RateLimiter | `MikroTik::rateLimiter()` | v1.2.0 |
 
 ---
 
