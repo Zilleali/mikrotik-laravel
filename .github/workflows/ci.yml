@@ -46,7 +46,7 @@ jobs:
 
   test-laravel13:
     runs-on: ubuntu-latest
-    name: PHP 8.3 / Laravel 13.*
+    name: PHP 8.3 / Laravel 13
 
     steps:
       - uses: actions/checkout@v4
@@ -64,8 +64,9 @@ jobs:
           composer require \
             "laravel/framework:13.*" \
             "orchestra/testbench:^11.0" \
+            "pestphp/pest-plugin-laravel:^3.0" \
             --no-update --no-interaction
-          composer update --no-interaction --prefer-dist --no-progress --ignore-platform-reqs
+          composer update --no-interaction --prefer-dist --no-progress --with-all-dependencies
 
       - name: Run Pest
         run: ./vendor/bin/pest --no-coverage
