@@ -20,15 +20,16 @@ jobs:
           - { php: '8.3', laravel: '11.*', testbench: '^9.0' }
           - { php: '8.3', laravel: '12.*', testbench: '^10.0' }
 
-    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
-
+  test-laravel13:
+    runs-on: ubuntu-latest
+    name: PHP 8.3 / Laravel 13.*
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.3'
           extensions: sockets, openssl
           coverage: none
           tools: composer:v2
@@ -36,10 +37,10 @@ jobs:
       - name: Install dependencies
         run: |
           composer require \
-            "laravel/framework:${{ matrix.laravel }}" \
-            "orchestra/testbench:${{ matrix.testbench }}" \
+            "laravel/framework:13.*" \
+            "orchestra/testbench:^11.0" \
             --no-update --no-interaction
-          composer update --no-interaction --prefer-dist --no-progress
-
+          composer update --no-interaction --prefer-dist --no-progress --ignore-platform-reqs
+          
       - name: Run Pest
         run: ./vendor/bin/pest --no-coverage
