@@ -22,12 +22,12 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^11.0|^12.0"
+        "illuminate/support": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
-        "orchestra/testbench": "^9.0|^10.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
     "config": {
@@ -59,10 +59,10 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
-    "test": "./vendor/bin/pest --no-coverage",
-    "test:coverage": "./vendor/bin/pest --coverage",
-    "lint": "./vendor/bin/php-cs-fixer fix --dry-run --diff",
-    "lint:fix": "./vendor/bin/php-cs-fixer fix",
-    "analyse": "./vendor/bin/phpstan analyse src --level=5"
-}
+        "test": "./vendor/bin/pest --no-coverage",
+        "test:coverage": "./vendor/bin/pest --coverage",
+        "lint": "./vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "lint:fix": "./vendor/bin/php-cs-fixer fix",
+        "analyse": "./vendor/bin/phpstan analyse src --level=5"
+    }
 }
