@@ -19,7 +19,6 @@ jobs:
           - { php: '8.2', laravel: '11.*', testbench: '^9.0' }
           - { php: '8.3', laravel: '11.*', testbench: '^9.0' }
           - { php: '8.3', laravel: '12.*', testbench: '^10.0' }
-          - { php: '8.3', laravel: '13.*', testbench: '^11.0' }
 
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
@@ -41,6 +40,36 @@ jobs:
             "orchestra/testbench:${{ matrix.testbench }}" \
             --no-update --no-interaction
           composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Run Pest
+        run: ./vendor/bin/pest --no-coverage
+
+  test-laravel13:
+    runs-on: ubuntu-latest
+    name: PHP 8.3 / Laravel 13.*
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc
+        with:
+          php-version: '8.3'
+          extensions: sockets, openssl
+          coverage: none
+          tools: composer:v2
+
+      - name: Remove pest-plugin-laravel from composer.json
+        run: |
+          composer remove pestphp/pest-plugin-laravel --no-update --dev
+
+      - name: Install Laravel 13 dependencies
+        run: |
+          composer require \
+            "laravel/framework:13.*" \
+            "orchestra/testbench:^11.0" \
+            --no-update --no-interaction --dev
+          composer update --no-interaction --prefer-dist --no-progress --with-all-dependencies
 
       - name: Run Pest
         run: ./vendor/bin/pest --no-coverage
