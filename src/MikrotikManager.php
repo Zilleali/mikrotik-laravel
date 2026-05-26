@@ -27,13 +27,13 @@ use ZillEAli\MikrotikLaravel\Services\RadiusManager;
 use ZillEAli\MikrotikLaravel\Services\RouteManager;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 use ZillEAli\MikrotikLaravel\Services\ScriptManager;
-use ZillEAli\MikrotikLaravel\Services\SessionMonitor; // New service for monitoring active PPPoE and Hotspot sessions in real-time
-use ZillEAli\MikrotikLaravel\Services\SyslogManager; // New service for managing system logs, log rules, and remote logging
-use ZillEAli\MikrotikLaravel\Services\SystemManager; // New service for managing system settings, clock, users, and more
-use ZillEAli\MikrotikLaravel\Services\UsageTracker; // New service for tracking bandwidth usage per IP/interface in real-time
-use ZillEAli\MikrotikLaravel\Services\VpnManager; // New service for managing VPN tunnels (IPsec, OpenVPN, WireGuard)
-use ZillEAli\MikrotikLaravel\Services\WirelessManager; // New service for managing wireless interfaces and settings
-use ZillEAli\MikrotikLaravel\Support\CachingProxy; // For wrapping managers with caching layer
+use ZillEAli\MikrotikLaravel\Services\SessionMonitor;
+use ZillEAli\MikrotikLaravel\Services\SyslogManager;
+use ZillEAli\MikrotikLaravel\Services\SystemManager;
+use ZillEAli\MikrotikLaravel\Services\UsageTracker;
+use ZillEAli\MikrotikLaravel\Services\VpnManager;
+use ZillEAli\MikrotikLaravel\Services\WirelessManager;
+use ZillEAli\MikrotikLaravel\Support\CachingProxy;
 
 /**
  * MikrotikManager
@@ -53,18 +53,16 @@ class MikrotikManager
 {
     /**
      * Connection pool — persistent RouterosClient instances keyed by router name.
-     * Prevents reconnecting on every method call.
      */
     protected ConnectionPool $pool;
 
     /**
      * Currently selected router name.
-     * Default is 'default' — uses top-level config values.
      */
     protected string $currentRouter = 'default';
 
     /**
-     * @param array $config Full mikrotik config array
+     * @param array<string, mixed> $config Full mikrotik config array
      */
     public function __construct(protected array $config)
     {
@@ -79,9 +77,6 @@ class MikrotikManager
      * Select a named router for the next operation.
      *
      * Resets to 'default' after each manager call automatically.
-     *
-     * Usage:
-     *  MikroTik::router('branch')->pppoe()->getSecrets()
      *
      * @param  string $name Router name from config.routers array
      * @return static
@@ -100,9 +95,6 @@ class MikrotikManager
     /**
      * Get or create a RouterosClient for the current router.
      *
-     * Uses ConnectionPool to cache connections.
-     * Implements SSL/plain selection and retry logic.
-     *
      * @return RouterosClient
      * @throws ConnectionException
      */
@@ -110,7 +102,6 @@ class MikrotikManager
     {
         $name = $this->resolveAndResetRouter();
 
-        // Return cached alive connection
         if ($this->pool->isAlive($name)) {
             return $this->pool->get($name);
         }
@@ -162,11 +153,11 @@ class MikrotikManager
     /**
      * Connect with automatic retry on failure.
      *
-     * @param  RouterosClient $client
-     * @param  int            $attempts  Max connection attempts
-     * @param  int            $delay     Delay between retries in milliseconds
-     * @param  string         $routerName
-     * @param  array          $cfg
+     * @param  RouterosClient      $client
+     * @param  int                 $attempts   Max connection attempts
+     * @param  int                 $delay      Delay between retries in milliseconds
+     * @param  string              $routerName
+     * @param  array<string, mixed> $cfg
      * @return void
      * @throws ConnectionException After all attempts fail
      */
@@ -209,9 +200,12 @@ class MikrotikManager
             exception: $lastException,
         ));
 
-        throw new ConnectionException(
-            "Failed to connect after {$attempts} attempt(s): " .
-            $lastException?->getMessage()
+        throw ConnectionException::retriesExhausted(
+            $cfg['host'] ?? '',
+            $cfg['port'] ?? 8728,
+            $attempts,
+            $routerName,
+            $lastException,
         );
     }
 
@@ -219,7 +213,7 @@ class MikrotikManager
      * Get config array for a named router.
      *
      * @param  string $name
-     * @return array
+     * @return array<string, mixed>
      * @throws ConnectionException If router name not found in config
      */
     protected function getRouterConfig(string $name): array
@@ -235,9 +229,7 @@ class MikrotikManager
         }
 
         if (! isset($this->config['routers'][$name])) {
-            throw new ConnectionException(
-                "Router '{$name}' not found in config/mikrotik.php routers array."
-            );
+            throw ConnectionException::routerNotFound($name);
         }
 
         return $this->config['routers'][$name];
@@ -356,6 +348,60 @@ class MikrotikManager
         return new BridgeManager($this->getClient());
     }
 
+    /** @return IpAddressManager */
+    public function ipAddress(): IpAddressManager
+    {
+        return new IpAddressManager($this->getClient());
+    }
+
+    /** @return ArpManager */
+    public function arp(): ArpManager
+    {
+        return new ArpManager($this->getClient());
+    }
+
+    /** @return DnsManager */
+    public function dns(): DnsManager
+    {
+        return new DnsManager($this->getClient());
+    }
+
+    /** @return RouteManager */
+    public function routes(): RouteManager
+    {
+        return new RouteManager($this->getClient());
+    }
+
+    /** @return NtpManager */
+    public function ntp(): NtpManager
+    {
+        return new NtpManager($this->getClient());
+    }
+
+    /** @return ScriptManager */
+    public function scripts(): ScriptManager
+    {
+        return new ScriptManager($this->getClient());
+    }
+
+    /** @return SyslogManager */
+    public function syslog(): SyslogManager
+    {
+        return new SyslogManager($this->getClient());
+    }
+
+    /** @return UsageTracker */
+    public function usageTracker(): UsageTracker
+    {
+        return new UsageTracker($this->getClient());
+    }
+
+    /** @return SessionMonitor */
+    public function sessionMonitor(): SessionMonitor
+    {
+        return new SessionMonitor($this->getClient());
+    }
+
     // =========================================================
     // Caching
     // =========================================================
@@ -422,59 +468,5 @@ class MikrotikManager
             uptime:   $uptime,
             reason:   $reason,
         ));
-    }
-    // ========================================================
-    // New Services
-    // =========================================================
-    /** @return IpAddressManager */
-    public function ipAddresses(): IpAddressManager
-    {
-        return new IpAddressManager($this->getClient());
-    }
-
-    /** @return ArpManager */
-    public function arp(): ArpManager
-    {
-        return new ArpManager($this->getClient());
-    }
-
-    /** @return DnsManager */
-    public function dns(): DnsManager
-    {
-        return new DnsManager($this->getClient());
-    }
-
-    /** @return RouteManager */
-    public function routes(): RouteManager
-    {
-        return new RouteManager($this->getClient());
-    }
-
-    /** @return NtpManager */
-    public function ntp(): NtpManager
-    {
-        return new NtpManager($this->getClient());
-    }
-
-    /** @return ScriptManager */
-    public function scripts(): ScriptManager
-    {
-        return new ScriptManager($this->getClient());
-    }
-    /** @return SyslogManager */
-    public function syslog(): SyslogManager
-    {
-        return new SyslogManager($this->getClient());
-    }
-
-    /** @return UsageTracker */
-    public function usageTracker(): UsageTracker
-    {
-        return new UsageTracker($this->getClient());
-    }
-    /** @return SessionMonitor */
-    public function sessionMonitor(): SessionMonitor
-    {
-        return new SessionMonitor($this->getClient());
     }
 }
