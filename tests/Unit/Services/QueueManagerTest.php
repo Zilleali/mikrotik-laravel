@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\QueueManager;
 
 // ─── Helper ───────────────────────────────────────────────────
@@ -93,37 +94,37 @@ it('creates simple queue without throwing', function () {
 
 // ─── updateQueue ──────────────────────────────────────────────
 
-it('updates queue without throwing', function () {
+it('throws when updating non-existent queue', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->updateQueue('ali-home', ['max-limit' => '20M/20M']))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── deleteQueue ──────────────────────────────────────────────
 
-it('deletes queue without throwing', function () {
+it('throws when deleting non-existent queue', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->deleteQueue('ali-home'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── setLimit ─────────────────────────────────────────────────
 
-it('sets bandwidth limit without throwing', function () {
+it('throws when setting limit on non-existent queue', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->setLimit('ali-home', '10M', '10M'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── bulkSetLimit ─────────────────────────────────────────────
 
-it('bulk sets limit for multiple queues', function () {
+it('throws when bulk setting limit for non-existent queues', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
@@ -133,25 +134,25 @@ it('bulk sets limit for multiple queues', function () {
     ];
 
     expect(fn () => $manager->bulkSetLimit($users))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── enableQueue / disableQueue ───────────────────────────────
 
-it('enables queue without throwing', function () {
+it('throws when enabling non-existent queue', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->enableQueue('ali-home'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
-it('disables queue without throwing', function () {
+it('throws when disabling non-existent queue', function () {
     $client = makeQueueClient();
     $manager = new QueueManager($client);
 
     expect(fn () => $manager->disableQueue('ali-home'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── getTreeQueues ────────────────────────────────────────────

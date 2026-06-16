@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -143,13 +144,10 @@ class IpAddressManager
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_SET,
@@ -168,13 +166,10 @@ class IpAddressManager
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_REMOVE,
@@ -193,13 +188,10 @@ class IpAddressManager
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_ENABLE,
@@ -218,13 +210,10 @@ class IpAddressManager
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_DISABLE,

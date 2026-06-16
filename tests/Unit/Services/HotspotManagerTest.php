@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 
 // ─── Helper ───────────────────────────────────────────────────
@@ -135,22 +136,22 @@ it('creates hotspot user without throwing', function () {
 
 // ─── deleteUser ───────────────────────────────────────────────
 
-it('deletes hotspot user without throwing', function () {
+it('throws when deleting non-existent hotspot user', function () {
     $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->deleteUser('user1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── kickHost ─────────────────────────────────────────────────
 
-it('kicks active hotspot host without throwing', function () {
+it('throws when kicking non-existent hotspot session', function () {
     $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->kickHost('user1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── generateVouchers ─────────────────────────────────────────
@@ -184,18 +185,18 @@ it('generates vouchers with correct prefix', function () {
 
 // ─── enableUser / disableUser ─────────────────────────────────
 
-it('enables hotspot user without throwing', function () {
+it('throws when enabling non-existent hotspot user', function () {
     $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->enableUser('user1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
-it('disables hotspot user without throwing', function () {
+it('throws when disabling non-existent hotspot user', function () {
     $client = makeHotspotClient();
     $manager = new HotspotManager($client);
 
     expect(fn () => $manager->disableUser('user1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });

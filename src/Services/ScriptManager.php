@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
@@ -138,13 +139,10 @@ class ScriptManager
         $script = $this->getScript($name);
 
         if (! $script) {
-            return;
+            throw ResourceNotFoundException::for('script', $name);
         }
 
-        $id = $this->extractId($script);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($script, 'script');
 
         $this->client->query(
             self::CMD_SCRIPT_SET,
@@ -163,13 +161,10 @@ class ScriptManager
         $script = $this->getScript($name);
 
         if (! $script) {
-            return;
+            throw ResourceNotFoundException::for('script', $name);
         }
 
-        $id = $this->extractId($script);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($script, 'script');
 
         $this->client->query(
             self::CMD_SCRIPT_REMOVE,
@@ -193,13 +188,10 @@ class ScriptManager
         $script = $this->getScript($name);
 
         if (! $script) {
-            return;
+            throw ResourceNotFoundException::for('script', $name);
         }
 
-        $id = $this->extractId($script);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($script, 'script');
 
         MikrotikLogger::critical('script', 'runScript', $name);
 
@@ -294,13 +286,10 @@ class ScriptManager
         $scheduler = $this->getScheduler($name);
 
         if (! $scheduler) {
-            return;
+            throw ResourceNotFoundException::for('scheduler', $name);
         }
 
-        $id = $this->extractId($scheduler);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($scheduler, 'scheduler');
 
         $this->client->query(
             self::CMD_SCHED_SET,
@@ -319,13 +308,10 @@ class ScriptManager
         $scheduler = $this->getScheduler($name);
 
         if (! $scheduler) {
-            return;
+            throw ResourceNotFoundException::for('scheduler', $name);
         }
 
-        $id = $this->extractId($scheduler);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($scheduler, 'scheduler');
 
         $this->client->query(
             self::CMD_SCHED_REMOVE,

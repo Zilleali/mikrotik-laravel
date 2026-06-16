@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
@@ -109,13 +110,10 @@ class HotspotManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_SET,
@@ -134,13 +132,10 @@ class HotspotManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_REMOVE,
@@ -161,13 +156,10 @@ class HotspotManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_ENABLE,
@@ -186,13 +178,10 @@ class HotspotManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_DISABLE,
@@ -228,13 +217,10 @@ class HotspotManager
         );
 
         if (empty($sessions)) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-session', $name);
         }
 
-        $id = $this->extractId($sessions[0]);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($sessions[0], 'hotspot-session');
 
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,

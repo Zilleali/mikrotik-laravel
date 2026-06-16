@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -113,13 +114,10 @@ class RouterUserManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_SET,
@@ -141,13 +139,10 @@ class RouterUserManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_REMOVE,
@@ -178,13 +173,10 @@ class RouterUserManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_ENABLE,
@@ -205,13 +197,10 @@ class RouterUserManager
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
 
-        $id = $this->extractId($user);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_DISABLE,

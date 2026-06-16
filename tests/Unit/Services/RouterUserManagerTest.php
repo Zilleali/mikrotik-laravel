@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 
 function makeRouterUserClient(array $responses = []): RouterosClient
@@ -123,12 +124,12 @@ it('deletes router user without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when deleting non-existent user', function () {
+it('throws when deleting non-existent user', function () {
     $client = makeRouterUserClient(['/user/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect(fn () => $manager->deleteUser('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── changePassword ───────────────────────────────────────────

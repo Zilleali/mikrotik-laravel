@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -109,13 +110,10 @@ class RadiusManager
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
 
-        $id = $this->extractId($server);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_SET,
@@ -134,13 +132,10 @@ class RadiusManager
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
 
-        $id = $this->extractId($server);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_REMOVE,
@@ -159,13 +154,10 @@ class RadiusManager
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
 
-        $id = $this->extractId($server);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_ENABLE,
@@ -184,13 +176,10 @@ class RadiusManager
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
 
-        $id = $this->extractId($server);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_DISABLE,
