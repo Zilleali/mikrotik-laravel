@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * InterfaceManager
@@ -22,6 +23,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class InterfaceManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT = '/interface/print';
     private const CMD_ENABLE = '/interface/enable';
     private const CMD_DISABLE = '/interface/disable';
@@ -159,7 +162,7 @@ class InterfaceManager
 
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $interface['.id'] ?? $name]
+            ['.id' => $this->extractId($interface) ?? $name]
         );
     }
 
@@ -182,7 +185,7 @@ class InterfaceManager
 
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $interface['.id'] ?? $name]
+            ['.id' => $this->extractId($interface) ?? $name]
         );
     }
 }

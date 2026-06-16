@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * IpPoolManager
@@ -22,6 +23,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class IpPoolManager
 {
+    use HasIdValidation;
+
     private const CMD_POOL_PRINT = '/ip/pool/print';
     private const CMD_POOL_ADD = '/ip/pool/add';
     private const CMD_POOL_REMOVE = '/ip/pool/remove';
@@ -94,9 +97,14 @@ class IpPoolManager
             return;
         }
 
+        $id = $this->extractId($pool);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_POOL_REMOVE,
-            ['.id' => $pool['.id']]
+            ['.id' => $id]
         );
     }
 

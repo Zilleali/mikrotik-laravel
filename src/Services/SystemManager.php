@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * SystemManager
@@ -170,6 +171,8 @@ class SystemManager
             '/system/identity/set',
             ['name' => $name]
         );
+
+        MikrotikLogger::warning('system', 'setIdentity', ['name' => $name]);
     }
 
     // =========================================================
@@ -265,6 +268,8 @@ class SystemManager
      */
     public function reboot(): void
     {
+        MikrotikLogger::critical('system', 'reboot', 'router');
+
         $this->client->query(self::CMD_REBOOT);
     }
 }

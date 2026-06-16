@@ -3,6 +3,8 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * QueueManager
@@ -22,6 +24,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class QueueManager
 {
+    use HasIdValidation;
+
     /**
      * RouterOS API commands
      */
@@ -106,9 +110,14 @@ class QueueManager
             return;
         }
 
+        $id = $this->extractId($queue);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SIMPLE_SET,
-            array_merge(['.id' => $queue['.id'] ?? ''], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -126,10 +135,17 @@ class QueueManager
             return;
         }
 
+        $id = $this->extractId($queue);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SIMPLE_REMOVE,
-            ['.id' => $queue['.id'] ?? '']
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('queue', 'deleteQueue', $name);
     }
 
     /**
@@ -146,9 +162,14 @@ class QueueManager
             return;
         }
 
+        $id = $this->extractId($queue);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SIMPLE_ENABLE,
-            ['.id' => $queue['.id'] ?? '']
+            ['.id' => $id]
         );
     }
 
@@ -166,9 +187,14 @@ class QueueManager
             return;
         }
 
+        $id = $this->extractId($queue);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SIMPLE_DISABLE,
-            ['.id' => $queue['.id'] ?? '']
+            ['.id' => $id]
         );
     }
 

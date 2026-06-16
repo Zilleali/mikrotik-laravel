@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * IpAddressManager
@@ -26,6 +27,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class IpAddressManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT   = '/ip/address/print';
     private const CMD_ADD     = '/ip/address/add';
     private const CMD_SET     = '/ip/address/set';
@@ -143,9 +146,14 @@ class IpAddressManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SET,
-            array_merge(['.id' => $entry['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -163,9 +171,14 @@ class IpAddressManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -183,9 +196,14 @@ class IpAddressManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -203,9 +221,14 @@ class IpAddressManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 }

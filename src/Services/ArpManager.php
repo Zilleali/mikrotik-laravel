@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * ArpManager
@@ -27,6 +28,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class ArpManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT = '/ip/arp/print';
     private const CMD_ADD = '/ip/arp/add';
     private const CMD_REMOVE = '/ip/arp/remove';
@@ -197,9 +200,14 @@ class ArpManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 

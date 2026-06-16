@@ -3,6 +3,8 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * HotspotManager
@@ -22,6 +24,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class HotspotManager
 {
+    use HasIdValidation;
+
     /**
      * RouterOS API commands
      */
@@ -108,9 +112,14 @@ class HotspotManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_SET,
-            array_merge(['.id' => $user['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -128,10 +137,17 @@ class HotspotManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_REMOVE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('hotspot', 'deleteUser', $name);
     }
 
     /**
@@ -148,9 +164,14 @@ class HotspotManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_ENABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -168,9 +189,14 @@ class HotspotManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_DISABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -205,10 +231,17 @@ class HotspotManager
             return;
         }
 
+        $id = $this->extractId($sessions[0]);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,
-            ['.id' => $sessions[0]['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('hotspot', 'kickHost', $name);
     }
 
     // =========================================================

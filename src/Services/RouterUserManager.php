@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * RouterUserManager
@@ -34,6 +35,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RouterUserManager
 {
+    use HasIdValidation;
+
     private const CMD_USER_PRINT = '/user/print';
     private const CMD_USER_ADD = '/user/add';
     private const CMD_USER_SET = '/user/set';
@@ -113,9 +116,14 @@ class RouterUserManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_SET,
-            array_merge(['.id' => $user['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -136,9 +144,14 @@ class RouterUserManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_REMOVE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -168,9 +181,14 @@ class RouterUserManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_ENABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -190,9 +208,14 @@ class RouterUserManager
             return;
         }
 
+        $id = $this->extractId($user);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_USER_DISABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 

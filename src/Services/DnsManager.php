@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * DnsManager
@@ -29,6 +30,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class DnsManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT = '/ip/dns/print';
     private const CMD_SET = '/ip/dns/set';
     private const CMD_FLUSH = '/ip/dns/flush';
@@ -221,9 +224,14 @@ class DnsManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_STATIC_SET,
-            array_merge(['.id' => $entry['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -241,9 +249,14 @@ class DnsManager
             return;
         }
 
+        $id = $this->extractId($entry);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_STATIC_REMOVE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 

@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * RouteManager
@@ -27,6 +28,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RouteManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT = '/ip/route/print';
     private const CMD_ADD = '/ip/route/add';
     private const CMD_SET = '/ip/route/set';
@@ -161,9 +164,14 @@ class RouteManager
             return;
         }
 
+        $id = $this->extractId($route);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SET,
-            array_merge(['.id' => $route['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -181,9 +189,14 @@ class RouteManager
             return;
         }
 
+        $id = $this->extractId($route);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $route['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -201,9 +214,14 @@ class RouteManager
             return;
         }
 
+        $id = $this->extractId($route);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $route['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -224,9 +242,14 @@ class RouteManager
             return;
         }
 
+        $id = $this->extractId($route);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $route['.id']]
+            ['.id' => $id]
         );
     }
 }

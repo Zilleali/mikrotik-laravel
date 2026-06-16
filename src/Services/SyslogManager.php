@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * SyslogManager
@@ -29,6 +30,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class SyslogManager
 {
+    use HasIdValidation;
+
     private const CMD_ACTION_PRINT  = '/system/logging/action/print';
     private const CMD_ACTION_ADD    = '/system/logging/action/add';
     private const CMD_ACTION_SET    = '/system/logging/action/set';
@@ -155,9 +158,14 @@ class SyslogManager
             return;
         }
 
+        $id = $this->extractId($target);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ACTION_SET,
-            array_merge(['.id' => $target['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -177,9 +185,14 @@ class SyslogManager
             return;
         }
 
+        $id = $this->extractId($target);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ACTION_REMOVE,
-            ['.id' => $target['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -243,9 +256,14 @@ class SyslogManager
                 ($rule['topics'] ?? '') === $topics &&
                 ($rule['action']  ?? '') === $action
             ) {
+                $id = $this->extractId($rule);
+                if ($id === null) {
+                    return;
+                }
+
                 $this->client->query(
                     self::CMD_RULE_REMOVE,
-                    ['.id' => $rule['.id']]
+                    ['.id' => $id]
                 );
                 return;
             }
