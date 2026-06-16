@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * SyslogManager
@@ -32,6 +33,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class SyslogManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_ACTION_PRINT  = '/system/logging/action/print';
     private const CMD_ACTION_ADD    = '/system/logging/action/add';
@@ -130,6 +132,9 @@ class SyslogManager
         int     $remotePort = 514,
         ?string $comment    = null
     ): void {
+        $this->validateNotEmpty($name, 'name');
+        $this->validateIp($remoteIp, 'remote-ip');
+        $this->validatePort($remotePort, 'remote-port');
         $data = [
             'name'        => $name,
             'target'      => 'remote',
@@ -229,6 +234,8 @@ class SyslogManager
      */
     public function addRule(string $topics, string $action): void
     {
+        $this->validateNotEmpty($topics, 'topics');
+        $this->validateNotEmpty($action, 'action');
         $this->client->query(self::CMD_RULE_ADD, [
             'topics' => $topics,
             'action' => $action,

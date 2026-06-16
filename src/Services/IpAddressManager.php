@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * IpAddressManager
@@ -29,6 +30,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class IpAddressManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_PRINT   = '/ip/address/print';
     private const CMD_ADD     = '/ip/address/add';
@@ -129,6 +131,7 @@ class IpAddressManager
      */
     public function addAddress(array $data): void
     {
+        $this->validateRequiredKeys($data, ['address', 'interface'], 'ip-address');
         $this->client->query(self::CMD_ADD, $data);
     }
 
@@ -141,6 +144,7 @@ class IpAddressManager
      */
     public function updateAddress(string $address, array $data): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
@@ -163,6 +167,7 @@ class IpAddressManager
      */
     public function removeAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
@@ -185,6 +190,7 @@ class IpAddressManager
      */
     public function enableAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
@@ -207,6 +213,7 @@ class IpAddressManager
      */
     public function disableAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {

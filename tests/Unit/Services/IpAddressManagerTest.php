@@ -163,3 +163,21 @@ it('returns false when address is not assigned', function () {
 
     expect($manager->isAddressAssigned('99.99.99.99/24'))->toBeFalse();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addAddress throws on missing required key', function () {
+    $client = makeIpAddressClient();
+    $manager = new IpAddressManager($client);
+
+    expect(fn () => $manager->addAddress(['address' => '192.168.1.1/24']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('updateAddress throws on invalid cidr', function () {
+    $client = makeIpAddressClient();
+    $manager = new IpAddressManager($client);
+
+    expect(fn () => $manager->updateAddress('not-a-cidr', []))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

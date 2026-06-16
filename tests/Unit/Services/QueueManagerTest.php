@@ -170,3 +170,21 @@ it('returns tree queues', function () {
     expect($queues)->toHaveCount(1)
         ->and($queues[0]['name'])->toBe('parent-queue');
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('createSimpleQueue throws on missing required key', function () {
+    $client = makeQueueClient();
+    $manager = new QueueManager($client);
+
+    expect(fn () => $manager->createSimpleQueue(['name' => 'my-queue']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteQueue throws on empty name', function () {
+    $client = makeQueueClient();
+    $manager = new QueueManager($client);
+
+    expect(fn () => $manager->deleteQueue(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

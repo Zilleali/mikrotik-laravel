@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
@@ -26,6 +27,7 @@ use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 class QueueManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     /**
      * RouterOS API commands
@@ -93,6 +95,7 @@ class QueueManager
      */
     public function createSimpleQueue(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'target'], 'simple-queue');
         $this->client->query(self::CMD_SIMPLE_ADD, $data);
     }
 
@@ -105,6 +108,7 @@ class QueueManager
      */
     public function updateQueue(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
@@ -127,6 +131,7 @@ class QueueManager
      */
     public function deleteQueue(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
@@ -151,6 +156,7 @@ class QueueManager
      */
     public function enableQueue(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
@@ -173,6 +179,7 @@ class QueueManager
      */
     public function disableQueue(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {

@@ -213,3 +213,21 @@ it('returns false when user has no active session', function () {
 
     expect($manager->isUserActive('admin'))->toBeFalse();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addUser throws on missing required key', function () {
+    $client = makeRouterUserClient();
+    $manager = new RouterUserManager($client);
+
+    expect(fn () => $manager->addUser(['name' => 'noc', 'password' => 'secret']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteUser throws on empty name', function () {
+    $client = makeRouterUserClient();
+    $manager = new RouterUserManager($client);
+
+    expect(fn () => $manager->deleteUser(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

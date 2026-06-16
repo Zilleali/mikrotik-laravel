@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * DnsManager
@@ -32,6 +33,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class DnsManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_PRINT = '/ip/dns/print';
     private const CMD_SET = '/ip/dns/set';
@@ -194,6 +196,8 @@ class DnsManager
         ?int    $ttl = null,
         ?string $comment = null
     ): void {
+        $this->validateNotEmpty($name, 'name');
+        $this->validateIp($address, 'address');
         $data = [
             'name' => $name,
             'address' => $address,
@@ -219,6 +223,7 @@ class DnsManager
      */
     public function updateStaticEntry(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $entry = $this->getStaticEntry($name);
 
         if (! $entry) {
@@ -241,6 +246,7 @@ class DnsManager
      */
     public function removeStaticEntry(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $entry = $this->getStaticEntry($name);
 
         if (! $entry) {

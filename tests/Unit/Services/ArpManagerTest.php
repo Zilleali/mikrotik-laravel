@@ -201,3 +201,29 @@ it('returns null when ip has no mac in arp table', function () {
 
     expect($manager->getMacByIp('99.99.99.99'))->toBeNull();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addStaticArp throws on invalid ip', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->addStaticArp('bad-ip', 'AA:BB:CC:DD:EE:FF', 'ether1'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addStaticArp throws on invalid mac', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->addStaticArp('192.168.1.1', 'not-a-mac', 'ether1'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeArp throws on invalid ip', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->removeArp('bad-ip'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

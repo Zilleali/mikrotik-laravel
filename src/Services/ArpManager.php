@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * ArpManager
@@ -30,6 +31,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class ArpManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_PRINT = '/ip/arp/print';
     private const CMD_ADD = '/ip/arp/add';
@@ -174,6 +176,9 @@ class ArpManager
         string  $interface,
         ?string $comment = null
     ): void {
+        $this->validateIp($ip, 'address');
+        $this->validateMac($mac, 'mac-address');
+        $this->validateNotEmpty($interface, 'interface');
         $data = [
             'address' => $ip,
             'mac-address' => $mac,
@@ -195,6 +200,7 @@ class ArpManager
      */
     public function removeArp(string $ip): void
     {
+        $this->validateIp($ip, 'address');
         $entry = $this->getArpByIp($ip);
 
         if (! $entry) {

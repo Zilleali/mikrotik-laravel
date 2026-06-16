@@ -152,3 +152,21 @@ it('deletes lease without throwing', function () {
     expect(fn () => $manager->deleteLease('AA:BB:CC:DD:EE:01'))
         ->not->toThrow(\Exception::class);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('makeLeaseStatic throws on invalid mac', function () {
+    $client = makeDhcpClient();
+    $manager = new DhcpManager($client);
+
+    expect(fn () => $manager->makeLeaseStatic('not-a-mac'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteLease throws on invalid mac', function () {
+    $client = makeDhcpClient();
+    $manager = new DhcpManager($client);
+
+    expect(fn () => $manager->deleteLease('not-a-mac'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

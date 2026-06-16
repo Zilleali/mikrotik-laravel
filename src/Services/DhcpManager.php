@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * DhcpManager
@@ -24,6 +25,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class DhcpManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_LEASE_PRINT = '/ip/dhcp-server/lease/print';
     private const CMD_LEASE_SET = '/ip/dhcp-server/lease/set';
@@ -108,6 +110,7 @@ class DhcpManager
      */
     public function makeLeaseStatic(string $mac): void
     {
+        $this->validateMac($mac, 'mac-address');
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {
@@ -130,6 +133,7 @@ class DhcpManager
      */
     public function deleteLease(string $mac): void
     {
+        $this->validateMac($mac, 'mac-address');
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {

@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
@@ -26,6 +27,7 @@ use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 class PppoeManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     /**
      * RouterOS API commands
@@ -96,6 +98,7 @@ class PppoeManager
      */
     public function createSecret(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password'], 'pppoe-secret');
         $this->client->query(self::CMD_SECRET_ADD, $data);
     }
 
@@ -108,6 +111,7 @@ class PppoeManager
      */
     public function updateSecret(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
@@ -130,6 +134,7 @@ class PppoeManager
      */
     public function deleteSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
@@ -154,6 +159,7 @@ class PppoeManager
      */
     public function enableSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
@@ -178,6 +184,7 @@ class PppoeManager
      */
     public function disableSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
@@ -280,6 +287,7 @@ class PppoeManager
      */
     public function kickSession(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $sessions = $this->client->query(
             self::CMD_ACTIVE_PRINT,
             queries: ["name={$name}"]

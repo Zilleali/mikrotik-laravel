@@ -186,3 +186,21 @@ it('filters ethernet interfaces only', function () {
     expect($ethernet)->toHaveCount(2)
         ->and($ethernet[0]['type'])->toBe('ether');
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('enableInterface throws on empty name', function () {
+    $client = makeInterfaceClient();
+    $manager = new InterfaceManager($client);
+
+    expect(fn () => $manager->enableInterface(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('disableInterface throws on empty name', function () {
+    $client = makeInterfaceClient();
+    $manager = new InterfaceManager($client);
+
+    expect(fn () => $manager->disableInterface(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
