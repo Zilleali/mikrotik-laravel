@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * RadiusManager
@@ -27,6 +30,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RadiusManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_PRINT = '/radius/print';
     private const CMD_ADD = '/radius/add';
     private const CMD_SET = '/radius/set';
@@ -91,6 +97,7 @@ class RadiusManager
      */
     public function addServer(array $data): void
     {
+        $this->validateRequiredKeys($data, ['address', 'secret'], 'radius-server');
         $this->client->query(self::CMD_ADD, $data);
     }
 
@@ -103,15 +110,18 @@ class RadiusManager
      */
     public function updateServer(string $address, array $data): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
+
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_SET,
-            array_merge(['.id' => $server['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -123,15 +133,18 @@ class RadiusManager
      */
     public function removeServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
+
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -143,15 +156,18 @@ class RadiusManager
      */
     public function enableServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
+
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -163,15 +179,18 @@ class RadiusManager
      */
     public function disableServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
-            return;
+            throw ResourceNotFoundException::for('radius-server', $address);
         }
+
+        $id = $this->extractId($server, 'radius-server');
 
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 

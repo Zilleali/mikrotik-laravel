@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
 
 function makeIpAddressClient(array $responses = []): RouterosClient
@@ -90,12 +91,12 @@ it('removes address without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent address', function () {
+it('throws when removing non-existent address', function () {
     $client  = makeIpAddressClient(['/ip/address/print' => []]);
     $manager = new IpAddressManager($client);
 
     expect(fn () => $manager->removeAddress('99.99.99.99/24'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── enableAddress / disableAddress ───────────────────────────
@@ -161,4 +162,22 @@ it('returns false when address is not assigned', function () {
     $manager = new IpAddressManager($client);
 
     expect($manager->isAddressAssigned('99.99.99.99/24'))->toBeFalse();
+});
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addAddress throws on missing required key', function () {
+    $client = makeIpAddressClient();
+    $manager = new IpAddressManager($client);
+
+    expect(fn () => $manager->addAddress(['address' => '192.168.1.1/24']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('updateAddress throws on invalid cidr', function () {
+    $client = makeIpAddressClient();
+    $manager = new IpAddressManager($client);
+
+    expect(fn () => $manager->updateAddress('not-a-cidr', []))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
 });

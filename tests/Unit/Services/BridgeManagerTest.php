@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 
 function makeBridgeClient(array $responses = []): RouterosClient
@@ -137,12 +138,12 @@ it('removes bridge without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent bridge', function () {
+it('throws when removing non-existent bridge', function () {
     $client = makeBridgeClient(['/interface/bridge/print' => []]);
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->removeBridge('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── addBridgePort ────────────────────────────────────────────
@@ -233,4 +234,30 @@ it('returns correct port count for bridge', function () {
     $manager = new BridgeManager($client);
 
     expect($manager->getPortCount('bridge1'))->toBe(2);
+});
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addBridge throws on missing name key', function () {
+    $client = makeBridgeClient();
+    $manager = new BridgeManager($client);
+
+    expect(fn () => $manager->addBridge(['vlan-filtering' => 'yes']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addBridgePort throws on missing required key', function () {
+    $client = makeBridgeClient();
+    $manager = new BridgeManager($client);
+
+    expect(fn () => $manager->addBridgePort(['bridge' => 'bridge1']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeBridge throws on empty name', function () {
+    $client = makeBridgeClient();
+    $manager = new BridgeManager($client);
+
+    expect(fn () => $manager->removeBridge(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
 });

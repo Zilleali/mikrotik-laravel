@@ -3,6 +3,10 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * HotspotManager
@@ -22,6 +26,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class HotspotManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     /**
      * RouterOS API commands
      */
@@ -90,6 +97,7 @@ class HotspotManager
      */
     public function createUser(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password'], 'hotspot-user');
         $this->client->query(self::CMD_USER_ADD, $data);
     }
 
@@ -102,15 +110,18 @@ class HotspotManager
      */
     public function updateUser(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
+
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_SET,
-            array_merge(['.id' => $user['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -122,16 +133,21 @@ class HotspotManager
      */
     public function deleteUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
+
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_REMOVE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('hotspot', 'deleteUser', $name);
     }
 
     /**
@@ -142,15 +158,18 @@ class HotspotManager
      */
     public function enableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
+
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_ENABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -162,15 +181,18 @@ class HotspotManager
      */
     public function disableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-user', $name);
         }
+
+        $id = $this->extractId($user, 'hotspot-user');
 
         $this->client->query(
             self::CMD_USER_DISABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -196,19 +218,24 @@ class HotspotManager
      */
     public function kickHost(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $sessions = $this->client->query(
             self::CMD_ACTIVE_PRINT,
             queries: ["user={$name}"]
         );
 
         if (empty($sessions)) {
-            return;
+            throw ResourceNotFoundException::for('hotspot-session', $name);
         }
+
+        $id = $this->extractId($sessions[0], 'hotspot-session');
 
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,
-            ['.id' => $sessions[0]['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('hotspot', 'kickHost', $name);
     }
 
     // =========================================================
