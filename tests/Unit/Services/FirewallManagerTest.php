@@ -196,3 +196,21 @@ it('returns false when ip is not in list', function () {
 
     expect($manager->isIpInList('9.9.9.9', 'blocked'))->toBeFalse();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addToAddressList throws on empty list name', function () {
+    $client = makeFirewallClient();
+    $manager = new FirewallManager($client);
+
+    expect(fn () => $manager->addToAddressList('1.2.3.4', ''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeFromAddressList throws on empty list name', function () {
+    $client = makeFirewallClient();
+    $manager = new FirewallManager($client);
+
+    expect(fn () => $manager->removeFromAddressList('1.2.3.4', ''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

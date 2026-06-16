@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * BridgeManager
@@ -28,6 +31,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class BridgeManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_BRIDGE_PRINT = '/interface/bridge/print';
     private const CMD_BRIDGE_ADD = '/interface/bridge/add';
     private const CMD_BRIDGE_REMOVE = '/interface/bridge/remove';
@@ -88,6 +94,7 @@ class BridgeManager
      */
     public function addBridge(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name'], 'bridge');
         $this->client->query(self::CMD_BRIDGE_ADD, $data);
     }
 
@@ -102,15 +109,18 @@ class BridgeManager
      */
     public function removeBridge(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $bridge = $this->getBridge($name);
 
         if (! $bridge) {
-            return;
+            throw ResourceNotFoundException::for('bridge', $name);
         }
+
+        $id = $this->extractId($bridge, 'bridge');
 
         $this->client->query(
             self::CMD_BRIDGE_REMOVE,
-            ['.id' => $bridge['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -169,6 +179,7 @@ class BridgeManager
      */
     public function addBridgePort(array $data): void
     {
+        $this->validateRequiredKeys($data, ['bridge', 'interface'], 'bridge-port');
         $this->client->query(self::CMD_PORT_ADD, $data);
     }
 
@@ -180,18 +191,21 @@ class BridgeManager
      */
     public function removeBridgePort(string $interfaceName): void
     {
+        $this->validateNotEmpty($interfaceName, 'interface');
         $ports = $this->client->query(
             self::CMD_PORT_PRINT,
             queries: ["interface={$interfaceName}"]
         );
 
         if (empty($ports)) {
-            return;
+            throw ResourceNotFoundException::for('bridge-port', $interfaceName);
         }
+
+        $id = $this->extractId($ports[0], 'bridge-port');
 
         $this->client->query(
             self::CMD_PORT_REMOVE,
-            ['.id' => $ports[0]['.id']]
+            ['.id' => $id]
         );
     }
 

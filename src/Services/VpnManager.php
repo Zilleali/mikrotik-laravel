@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * VpnManager
@@ -29,6 +32,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class VpnManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_WG_IFACE_PRINT = '/interface/wireguard/print';
     private const CMD_WG_PEER_PRINT = '/interface/wireguard/peers/print';
     private const CMD_WG_PEER_ADD = '/interface/wireguard/peers/add';
@@ -100,6 +106,7 @@ class VpnManager
      */
     public function addWireGuardPeer(array $data): void
     {
+        $this->validateRequiredKeys($data, ['interface', 'public-key', 'allowed-address'], 'wireguard-peer');
         $this->client->query(self::CMD_WG_PEER_ADD, $data);
     }
 
@@ -117,12 +124,14 @@ class VpnManager
         );
 
         if (empty($peers)) {
-            return;
+            throw ResourceNotFoundException::for('wireguard-peer', $publicKey);
         }
+
+        $id = $this->extractId($peers[0], 'wireguard-peer');
 
         $this->client->query(
             self::CMD_WG_PEER_REMOVE,
-            ['.id' => $peers[0]['.id']]
+            ['.id' => $id]
         );
     }
 

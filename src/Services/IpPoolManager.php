@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * IpPoolManager
@@ -22,6 +25,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class IpPoolManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_POOL_PRINT = '/ip/pool/print';
     private const CMD_POOL_ADD = '/ip/pool/add';
     private const CMD_POOL_REMOVE = '/ip/pool/remove';
@@ -77,6 +83,7 @@ class IpPoolManager
      */
     public function createPool(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'ranges'], 'ip-pool');
         $this->client->query(self::CMD_POOL_ADD, $data);
     }
 
@@ -91,12 +98,14 @@ class IpPoolManager
         $pool = $this->getPool($name);
 
         if (! $pool) {
-            return;
+            throw ResourceNotFoundException::for('ip-pool', $name);
         }
+
+        $id = $this->extractId($pool, 'ip-pool');
 
         $this->client->query(
             self::CMD_POOL_REMOVE,
-            ['.id' => $pool['.id']]
+            ['.id' => $id]
         );
     }
 

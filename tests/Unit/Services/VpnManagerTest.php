@@ -197,3 +197,13 @@ it('returns total active vpn session count', function () {
 
     expect($manager->getActiveVpnCount())->toBe(3);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addWireGuardPeer throws on missing required key', function () {
+    $client = makeVpnClient();
+    $manager = new VpnManager($client);
+
+    expect(fn () => $manager->addWireGuardPeer(['interface' => 'wg0', 'public-key' => 'abc==']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\RouteManager;
 
 function makeRouteClient(array $responses = []): RouterosClient
@@ -162,12 +163,12 @@ it('removes route without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent route', function () {
+it('throws when removing non-existent route', function () {
     $client = makeRouteClient(['/ip/route/print' => []]);
     $manager = new RouteManager($client);
 
     expect(fn () => $manager->removeRoute('99.0.0.0/8'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── enableRoute / disableRoute ───────────────────────────────
@@ -214,4 +215,30 @@ it('returns routes by gateway', function () {
 
     expect($routes)->toHaveCount(2)
         ->and($routes[0]['gateway'])->toBe('192.168.1.1');
+});
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addRoute throws on invalid destination cidr', function () {
+    $client = makeRouteClient();
+    $manager = new RouteManager($client);
+
+    expect(fn () => $manager->addRoute('bad-cidr', '192.168.1.1'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addRoute throws on invalid gateway ip', function () {
+    $client = makeRouteClient();
+    $manager = new RouteManager($client);
+
+    expect(fn () => $manager->addRoute('10.0.0.0/8', 'not-an-ip'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('updateRoute throws on invalid cidr', function () {
+    $client = makeRouteClient();
+    $manager = new RouteManager($client);
+
+    expect(fn () => $manager->updateRoute('bad-cidr', []))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
 });
