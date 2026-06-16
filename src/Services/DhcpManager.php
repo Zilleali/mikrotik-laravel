@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * DhcpManager
@@ -21,6 +22,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class DhcpManager
 {
+    use HasIdValidation;
+
     private const CMD_LEASE_PRINT = '/ip/dhcp-server/lease/print';
     private const CMD_LEASE_SET = '/ip/dhcp-server/lease/set';
     private const CMD_LEASE_REMOVE = '/ip/dhcp-server/lease/remove';
@@ -110,9 +113,14 @@ class DhcpManager
             return;
         }
 
+        $id = $this->extractId($lease);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_LEASE_SET,
-            ['.id' => $lease['.id'], 'address' => $lease['address']]
+            ['.id' => $id, 'address' => $lease['address']]
         );
     }
 
@@ -130,9 +138,14 @@ class DhcpManager
             return;
         }
 
+        $id = $this->extractId($lease);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_LEASE_REMOVE,
-            ['.id' => $lease['.id']]
+            ['.id' => $id]
         );
     }
 

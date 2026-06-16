@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * WirelessManager
@@ -24,6 +25,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class WirelessManager
 {
+    use HasIdValidation;
+
     private const CMD_IFACE_PRINT = '/interface/wireless/print';
     private const CMD_REG_TABLE = '/interface/wireless/registration-table/print';
     private const CMD_ACCESS_LIST_PRINT = '/interface/wireless/access-list/print';
@@ -147,9 +150,14 @@ class WirelessManager
             return;
         }
 
+        $id = $this->extractId($entries[0]);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ACCESS_LIST_REMOVE,
-            ['.id' => $entries[0]['.id']]
+            ['.id' => $id]
         );
     }
 }

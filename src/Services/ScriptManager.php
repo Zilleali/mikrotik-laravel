@@ -3,6 +3,8 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * ScriptManager
@@ -29,6 +31,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class ScriptManager
 {
+    use HasIdValidation;
+
     private const CMD_SCRIPT_PRINT = '/system/script/print';
     private const CMD_SCRIPT_ADD = '/system/script/add';
     private const CMD_SCRIPT_SET = '/system/script/set';
@@ -137,9 +141,14 @@ class ScriptManager
             return;
         }
 
+        $id = $this->extractId($script);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SCRIPT_SET,
-            array_merge(['.id' => $script['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -157,10 +166,17 @@ class ScriptManager
             return;
         }
 
+        $id = $this->extractId($script);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SCRIPT_REMOVE,
-            ['.id' => $script['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('script', 'removeScript', $name);
     }
 
     /**
@@ -180,9 +196,16 @@ class ScriptManager
             return;
         }
 
+        $id = $this->extractId($script);
+        if ($id === null) {
+            return;
+        }
+
+        MikrotikLogger::critical('script', 'runScript', $name);
+
         $this->client->query(
             self::CMD_SCRIPT_RUN,
-            ['.id' => $script['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -274,9 +297,14 @@ class ScriptManager
             return;
         }
 
+        $id = $this->extractId($scheduler);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SCHED_SET,
-            array_merge(['.id' => $scheduler['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -294,9 +322,14 @@ class ScriptManager
             return;
         }
 
+        $id = $this->extractId($scheduler);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SCHED_REMOVE,
-            ['.id' => $scheduler['.id']]
+            ['.id' => $id]
         );
     }
 }

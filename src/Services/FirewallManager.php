@@ -3,6 +3,8 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * FirewallManager
@@ -22,6 +24,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class FirewallManager
 {
+    use HasIdValidation;
+
     /**
      * RouterOS API commands
      */
@@ -89,6 +93,8 @@ class FirewallManager
             self::CMD_FILTER_REMOVE,
             ['.id' => $id]
         );
+
+        MikrotikLogger::critical('firewall', 'removeFilterRule', $id);
     }
 
     // =========================================================
@@ -200,6 +206,8 @@ class FirewallManager
         }
 
         $this->client->query(self::CMD_ADDRLIST_ADD, $data);
+
+        MikrotikLogger::warning('firewall', 'addToAddressList', ['ip' => $ip, 'list' => $list]);
     }
 
     /**
@@ -220,10 +228,17 @@ class FirewallManager
             return;
         }
 
+        $id = $this->extractId($entries[0]);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ADDRLIST_REMOVE,
-            ['.id' => $entries[0]['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('firewall', 'removeFromAddressList', "{$ip}@{$list}");
     }
 
     /**

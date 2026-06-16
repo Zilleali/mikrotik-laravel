@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * RadiusManager
@@ -27,6 +28,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RadiusManager
 {
+    use HasIdValidation;
+
     private const CMD_PRINT = '/radius/print';
     private const CMD_ADD = '/radius/add';
     private const CMD_SET = '/radius/set';
@@ -109,9 +112,14 @@ class RadiusManager
             return;
         }
 
+        $id = $this->extractId($server);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_SET,
-            array_merge(['.id' => $server['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -129,9 +137,14 @@ class RadiusManager
             return;
         }
 
+        $id = $this->extractId($server);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -149,9 +162,14 @@ class RadiusManager
             return;
         }
 
+        $id = $this->extractId($server);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -169,9 +187,14 @@ class RadiusManager
             return;
         }
 
+        $id = $this->extractId($server);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $server['.id']]
+            ['.id' => $id]
         );
     }
 

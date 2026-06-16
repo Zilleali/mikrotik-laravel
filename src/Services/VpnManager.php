@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * VpnManager
@@ -29,6 +30,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class VpnManager
 {
+    use HasIdValidation;
+
     private const CMD_WG_IFACE_PRINT = '/interface/wireguard/print';
     private const CMD_WG_PEER_PRINT = '/interface/wireguard/peers/print';
     private const CMD_WG_PEER_ADD = '/interface/wireguard/peers/add';
@@ -120,9 +123,14 @@ class VpnManager
             return;
         }
 
+        $id = $this->extractId($peers[0]);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_WG_PEER_REMOVE,
-            ['.id' => $peers[0]['.id']]
+            ['.id' => $id]
         );
     }
 

@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
  * BridgeManager
@@ -28,6 +29,8 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class BridgeManager
 {
+    use HasIdValidation;
+
     private const CMD_BRIDGE_PRINT = '/interface/bridge/print';
     private const CMD_BRIDGE_ADD = '/interface/bridge/add';
     private const CMD_BRIDGE_REMOVE = '/interface/bridge/remove';
@@ -108,9 +111,14 @@ class BridgeManager
             return;
         }
 
+        $id = $this->extractId($bridge);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_BRIDGE_REMOVE,
-            ['.id' => $bridge['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -189,9 +197,14 @@ class BridgeManager
             return;
         }
 
+        $id = $this->extractId($ports[0]);
+        if ($id === null) {
+            return;
+        }
+
         $this->client->query(
             self::CMD_PORT_REMOVE,
-            ['.id' => $ports[0]['.id']]
+            ['.id' => $id]
         );
     }
 
