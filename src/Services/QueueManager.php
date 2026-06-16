@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
@@ -107,13 +108,10 @@ class QueueManager
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
-            return;
+            throw ResourceNotFoundException::for('simple-queue', $name);
         }
 
-        $id = $this->extractId($queue);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($queue, 'simple-queue');
 
         $this->client->query(
             self::CMD_SIMPLE_SET,
@@ -132,13 +130,10 @@ class QueueManager
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
-            return;
+            throw ResourceNotFoundException::for('simple-queue', $name);
         }
 
-        $id = $this->extractId($queue);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($queue, 'simple-queue');
 
         $this->client->query(
             self::CMD_SIMPLE_REMOVE,
@@ -159,13 +154,10 @@ class QueueManager
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
-            return;
+            throw ResourceNotFoundException::for('simple-queue', $name);
         }
 
-        $id = $this->extractId($queue);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($queue, 'simple-queue');
 
         $this->client->query(
             self::CMD_SIMPLE_ENABLE,
@@ -184,13 +176,10 @@ class QueueManager
         $queue = $this->getSimpleQueue($name);
 
         if (! $queue) {
-            return;
+            throw ResourceNotFoundException::for('simple-queue', $name);
         }
 
-        $id = $this->extractId($queue);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($queue, 'simple-queue');
 
         $this->client->query(
             self::CMD_SIMPLE_DISABLE,

@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -108,13 +109,10 @@ class BridgeManager
         $bridge = $this->getBridge($name);
 
         if (! $bridge) {
-            return;
+            throw ResourceNotFoundException::for('bridge', $name);
         }
 
-        $id = $this->extractId($bridge);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($bridge, 'bridge');
 
         $this->client->query(
             self::CMD_BRIDGE_REMOVE,
@@ -194,13 +192,10 @@ class BridgeManager
         );
 
         if (empty($ports)) {
-            return;
+            throw ResourceNotFoundException::for('bridge-port', $interfaceName);
         }
 
-        $id = $this->extractId($ports[0]);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($ports[0], 'bridge-port');
 
         $this->client->query(
             self::CMD_PORT_REMOVE,

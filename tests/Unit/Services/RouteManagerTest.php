@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\RouteManager;
 
 function makeRouteClient(array $responses = []): RouterosClient
@@ -162,12 +163,12 @@ it('removes route without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent route', function () {
+it('throws when removing non-existent route', function () {
     $client = makeRouteClient(['/ip/route/print' => []]);
     $manager = new RouteManager($client);
 
     expect(fn () => $manager->removeRoute('99.0.0.0/8'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── enableRoute / disableRoute ───────────────────────────────

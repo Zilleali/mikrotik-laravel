@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -197,13 +198,10 @@ class ArpManager
         $entry = $this->getArpByIp($ip);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('arp-entry', $ip);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'arp-entry');
 
         $this->client->query(
             self::CMD_REMOVE,

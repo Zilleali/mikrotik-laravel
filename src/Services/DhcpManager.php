@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -110,13 +111,10 @@ class DhcpManager
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {
-            return;
+            throw ResourceNotFoundException::for('dhcp-lease', $mac);
         }
 
-        $id = $this->extractId($lease);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($lease, 'dhcp-lease');
 
         $this->client->query(
             self::CMD_LEASE_SET,
@@ -135,13 +133,10 @@ class DhcpManager
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {
-            return;
+            throw ResourceNotFoundException::for('dhcp-lease', $mac);
         }
 
-        $id = $this->extractId($lease);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($lease, 'dhcp-lease');
 
         $this->client->query(
             self::CMD_LEASE_REMOVE,

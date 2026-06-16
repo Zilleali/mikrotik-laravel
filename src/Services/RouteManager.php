@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -161,13 +162,10 @@ class RouteManager
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
-            return;
+            throw ResourceNotFoundException::for('route', $destination);
         }
 
-        $id = $this->extractId($route);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($route, 'route');
 
         $this->client->query(
             self::CMD_SET,
@@ -186,13 +184,10 @@ class RouteManager
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
-            return;
+            throw ResourceNotFoundException::for('route', $destination);
         }
 
-        $id = $this->extractId($route);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($route, 'route');
 
         $this->client->query(
             self::CMD_REMOVE,
@@ -211,13 +206,10 @@ class RouteManager
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
-            return;
+            throw ResourceNotFoundException::for('route', $destination);
         }
 
-        $id = $this->extractId($route);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($route, 'route');
 
         $this->client->query(
             self::CMD_ENABLE,
@@ -239,13 +231,10 @@ class RouteManager
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
-            return;
+            throw ResourceNotFoundException::for('route', $destination);
         }
 
-        $id = $this->extractId($route);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($route, 'route');
 
         $this->client->query(
             self::CMD_DISABLE,

@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -157,12 +158,12 @@ class InterfaceManager
         $interface = $this->getInterface($name);
 
         if (! $interface) {
-            return;
+            throw ResourceNotFoundException::for('interface', $name);
         }
 
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $this->extractId($interface) ?? $name]
+            ['.id' => $interface['.id'] ?? $name]
         );
     }
 
@@ -180,12 +181,12 @@ class InterfaceManager
         $interface = $this->getInterface($name);
 
         if (! $interface) {
-            return;
+            throw ResourceNotFoundException::for('interface', $name);
         }
 
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $this->extractId($interface) ?? $name]
+            ['.id' => $interface['.id'] ?? $name]
         );
     }
 }

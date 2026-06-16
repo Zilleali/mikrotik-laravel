@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -221,13 +222,10 @@ class DnsManager
         $entry = $this->getStaticEntry($name);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('dns-static-entry', $name);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'dns-static-entry');
 
         $this->client->query(
             self::CMD_STATIC_SET,
@@ -246,13 +244,10 @@ class DnsManager
         $entry = $this->getStaticEntry($name);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('dns-static-entry', $name);
         }
 
-        $id = $this->extractId($entry);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entry, 'dns-static-entry');
 
         $this->client->query(
             self::CMD_STATIC_REMOVE,

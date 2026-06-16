@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
@@ -110,13 +111,10 @@ class PppoeManager
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
 
-        $id = $this->extractId($secret);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_SET,
@@ -135,13 +133,10 @@ class PppoeManager
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
 
-        $id = $this->extractId($secret);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_REMOVE,
@@ -162,13 +157,10 @@ class PppoeManager
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
 
-        $id = $this->extractId($secret);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_ENABLE,
@@ -189,13 +181,10 @@ class PppoeManager
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
 
-        $id = $this->extractId($secret);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_DISABLE,
@@ -297,14 +286,11 @@ class PppoeManager
         );
 
         if (empty($sessions)) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-session', $name);
         }
 
         $session = $sessions[0];
-        $id = $this->extractId($session);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($session, 'pppoe-session');
 
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,

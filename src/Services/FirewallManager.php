@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
@@ -225,13 +226,10 @@ class FirewallManager
         );
 
         if (empty($entries)) {
-            return;
+            throw ResourceNotFoundException::for('firewall-address-list-entry', "{$ip}@{$list}");
         }
 
-        $id = $this->extractId($entries[0]);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($entries[0], 'firewall-address-list-entry');
 
         $this->client->query(
             self::CMD_ADDRLIST_REMOVE,

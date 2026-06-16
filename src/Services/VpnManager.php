@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -120,13 +121,10 @@ class VpnManager
         );
 
         if (empty($peers)) {
-            return;
+            throw ResourceNotFoundException::for('wireguard-peer', $publicKey);
         }
 
-        $id = $this->extractId($peers[0]);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($peers[0], 'wireguard-peer');
 
         $this->client->query(
             self::CMD_WG_PEER_REMOVE,

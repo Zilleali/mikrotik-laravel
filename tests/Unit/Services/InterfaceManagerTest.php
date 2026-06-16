@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 
 function makeInterfaceClient(array $responses = []): RouterosClient
@@ -111,20 +112,20 @@ it('returns only disabled interfaces', function () {
 
 // ─── enable / disable ─────────────────────────────────────────
 
-it('enables interface without throwing', function () {
+it('throws when enabling non-existent interface', function () {
     $client = makeInterfaceClient();
     $manager = new InterfaceManager($client);
 
     expect(fn () => $manager->enableInterface('ether1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
-it('disables interface without throwing', function () {
+it('throws when disabling non-existent interface', function () {
     $client = makeInterfaceClient();
     $manager = new InterfaceManager($client);
 
     expect(fn () => $manager->disableInterface('ether1'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── getTraffic ───────────────────────────────────────────────

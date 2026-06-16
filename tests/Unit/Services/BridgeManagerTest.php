@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 
 function makeBridgeClient(array $responses = []): RouterosClient
@@ -137,12 +138,12 @@ it('removes bridge without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent bridge', function () {
+it('throws when removing non-existent bridge', function () {
     $client = makeBridgeClient(['/interface/bridge/print' => []]);
     $manager = new BridgeManager($client);
 
     expect(fn () => $manager->removeBridge('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── addBridgePort ────────────────────────────────────────────

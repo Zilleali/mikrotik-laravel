@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 
 // ─── Helper — mock client banana ──────────────────────────────
@@ -138,64 +139,64 @@ it('returns pppoe profiles', function () {
 
 // ─── enableSecret / disableSecret ─────────────────────────────
 
-it('enables a pppoe secret without throwing', function () {
+it('throws when enabling non-existent pppoe secret', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
-    expect(fn () => $manager->enableSecret('ali-home'))->not->toThrow(\Exception::class);
+    expect(fn () => $manager->enableSecret('ali-home'))->toThrow(ResourceNotFoundException::class);
 });
 
-it('disables a pppoe secret without throwing', function () {
+it('throws when disabling non-existent pppoe secret', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
-    expect(fn () => $manager->disableSecret('ali-home'))->not->toThrow(\Exception::class);
+    expect(fn () => $manager->disableSecret('ali-home'))->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── bulkEnable / bulkDisable ─────────────────────────────────
 
-it('bulk enables multiple secrets', function () {
+it('throws when bulk enabling non-existent secrets', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkEnable(['ali-home', 'zain-fiber']))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
-it('bulk disables multiple secrets', function () {
+it('throws when bulk disabling non-existent secrets', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkDisable(['ali-home', 'zain-fiber']))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── deleteSecret ─────────────────────────────────────────────
 
-it('deletes a pppoe secret without throwing', function () {
+it('throws when deleting non-existent pppoe secret', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->deleteSecret('ali-home'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── kickSession ──────────────────────────────────────────────
 
-it('kicks an active session without throwing', function () {
+it('throws when kicking non-existent pppoe session', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->kickSession('ali-home'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── bulkKick ─────────────────────────────────────────────────
 
-it('bulk kicks multiple sessions', function () {
+it('throws when bulk kicking non-existent sessions', function () {
     $client = mockClient();
     $manager = new PppoeManager($client);
 
     expect(fn () => $manager->bulkKick(['ali-home', 'zain-fiber']))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });

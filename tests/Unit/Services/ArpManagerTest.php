@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\ArpManager;
 
 function makeArpClient(array $responses = []): RouterosClient
@@ -145,12 +146,12 @@ it('removes arp entry without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent arp entry', function () {
+it('throws when removing non-existent arp entry', function () {
     $client = makeArpClient(['/ip/arp/print' => []]);
     $manager = new ArpManager($client);
 
     expect(fn () => $manager->removeArp('99.99.99.99'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── flushArpTable ────────────────────────────────────────────

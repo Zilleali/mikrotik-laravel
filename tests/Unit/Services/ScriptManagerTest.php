@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\ScriptManager;
 
 function makeScriptClient(array $responses = []): RouterosClient
@@ -118,12 +119,12 @@ it('removes script without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent script', function () {
+it('throws when removing non-existent script', function () {
     $client = makeScriptClient(['/system/script/print' => []]);
     $manager = new ScriptManager($client);
 
     expect(fn () => $manager->removeScript('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── runScript ────────────────────────────────────────────────
@@ -141,12 +142,12 @@ it('runs script without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when running non-existent script', function () {
+it('throws when running non-existent script', function () {
     $client = makeScriptClient(['/system/script/print' => []]);
     $manager = new ScriptManager($client);
 
     expect(fn () => $manager->runScript('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── getSchedulers ────────────────────────────────────────────

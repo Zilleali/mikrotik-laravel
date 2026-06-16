@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 
 /**
@@ -155,13 +156,10 @@ class SyslogManager
         $target = $this->getTarget($name);
 
         if (! $target) {
-            return;
+            throw ResourceNotFoundException::for('logging-target', $name);
         }
 
-        $id = $this->extractId($target);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($target, 'logging-target');
 
         $this->client->query(
             self::CMD_ACTION_SET,
@@ -182,13 +180,10 @@ class SyslogManager
         $target = $this->getTarget($name);
 
         if (! $target) {
-            return;
+            throw ResourceNotFoundException::for('logging-target', $name);
         }
 
-        $id = $this->extractId($target);
-        if ($id === null) {
-            return;
-        }
+        $id = $this->extractId($target, 'logging-target');
 
         $this->client->query(
             self::CMD_ACTION_REMOVE,
@@ -256,10 +251,7 @@ class SyslogManager
                 ($rule['topics'] ?? '') === $topics &&
                 ($rule['action']  ?? '') === $action
             ) {
-                $id = $this->extractId($rule);
-                if ($id === null) {
-                    return;
-                }
+                $id = $this->extractId($rule, 'logging-rule');
 
                 $this->client->query(
                     self::CMD_RULE_REMOVE,
@@ -268,6 +260,8 @@ class SyslogManager
                 return;
             }
         }
+
+        throw ResourceNotFoundException::for('logging-rule', "{$topics}@{$action}");
     }
 
     /**
