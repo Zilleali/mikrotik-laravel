@@ -6,8 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.4.0] — 2026-05-26
 
-## [1.2.1] — 2026-05-20
+### Added
+- PHPStan level 5 static analysis — zero errors
+- `ConnectionException` factory methods — unreachable, 
+  authenticationFailed, timeout, routerNotFound, retriesExhausted
+- `ApiException` factory methods — fromTrap, permissionDenied, notFound
+- PHPStan CI job added to pipeline
+- Facade `@method` docblocks fixed — all use statements added
+
+### Fixed
+- `MikrotikManager` — inline comments cleaned
+- `MikroTik` Facade — missing use statements added
+
+## [1.3.0] — 2026-05-20
 
 ### Fixed
 - CI pipeline — pin `shivammathur/setup-php` to commit hash
