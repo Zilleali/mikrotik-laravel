@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * IpAddressManager
@@ -26,6 +29,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class IpAddressManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_PRINT   = '/ip/address/print';
     private const CMD_ADD     = '/ip/address/add';
     private const CMD_SET     = '/ip/address/set';
@@ -125,6 +131,7 @@ class IpAddressManager
      */
     public function addAddress(array $data): void
     {
+        $this->validateRequiredKeys($data, ['address', 'interface'], 'ip-address');
         $this->client->query(self::CMD_ADD, $data);
     }
 
@@ -137,15 +144,18 @@ class IpAddressManager
      */
     public function updateAddress(string $address, array $data): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
+
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_SET,
-            array_merge(['.id' => $entry['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -157,15 +167,18 @@ class IpAddressManager
      */
     public function removeAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
+
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_REMOVE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -177,15 +190,18 @@ class IpAddressManager
      */
     public function enableAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
+
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_ENABLE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -197,15 +213,18 @@ class IpAddressManager
      */
     public function disableAddress(string $address): void
     {
+        $this->validateCidr($address, 'address');
         $entry = $this->getAddress($address);
 
         if (! $entry) {
-            return;
+            throw ResourceNotFoundException::for('ip-address', $address);
         }
+
+        $id = $this->extractId($entry, 'ip-address');
 
         $this->client->query(
             self::CMD_DISABLE,
-            ['.id' => $entry['.id']]
+            ['.id' => $id]
         );
     }
 }

@@ -185,3 +185,29 @@ it('returns false when no remote logging', function () {
 
     expect($manager->hasRemoteLogging())->toBeFalse();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addRemoteTarget throws on invalid remote ip', function () {
+    $client = makeSyslogClient();
+    $manager = new SyslogManager($client);
+
+    expect(fn () => $manager->addRemoteTarget('my-log', 'not-an-ip'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addRemoteTarget throws on empty name', function () {
+    $client = makeSyslogClient();
+    $manager = new SyslogManager($client);
+
+    expect(fn () => $manager->addRemoteTarget('', '192.168.1.100'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addRule throws on empty topics', function () {
+    $client = makeSyslogClient();
+    $manager = new SyslogManager($client);
+
+    expect(fn () => $manager->addRule('', 'remote'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

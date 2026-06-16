@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * RouterUserManager
@@ -34,6 +37,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class RouterUserManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_USER_PRINT = '/user/print';
     private const CMD_USER_ADD = '/user/add';
     private const CMD_USER_SET = '/user/set';
@@ -95,6 +101,7 @@ class RouterUserManager
      */
     public function addUser(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password', 'group'], 'router-user');
         $this->client->query(self::CMD_USER_ADD, $data);
     }
 
@@ -107,15 +114,18 @@ class RouterUserManager
      */
     public function updateUser(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
+
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_SET,
-            array_merge(['.id' => $user['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -130,15 +140,18 @@ class RouterUserManager
      */
     public function deleteUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
+
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_REMOVE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -162,15 +175,18 @@ class RouterUserManager
      */
     public function enableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
+
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_ENABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -184,15 +200,18 @@ class RouterUserManager
      */
     public function disableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
-            return;
+            throw ResourceNotFoundException::for('router-user', $name);
         }
+
+        $id = $this->extractId($user, 'router-user');
 
         $this->client->query(
             self::CMD_USER_DISABLE,
-            ['.id' => $user['.id']]
+            ['.id' => $id]
         );
     }
 

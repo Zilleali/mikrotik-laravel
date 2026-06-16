@@ -3,6 +3,10 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * PppoeManager
@@ -22,6 +26,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class PppoeManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     /**
      * RouterOS API commands
      */
@@ -91,6 +98,7 @@ class PppoeManager
      */
     public function createSecret(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password'], 'pppoe-secret');
         $this->client->query(self::CMD_SECRET_ADD, $data);
     }
 
@@ -103,15 +111,18 @@ class PppoeManager
      */
     public function updateSecret(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
+
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_SET,
-            array_merge(['.id' => $secret['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -123,16 +134,21 @@ class PppoeManager
      */
     public function deleteSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
+
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_REMOVE,
-            ['.id' => $secret['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('pppoe', 'deleteSecret', $name);
     }
 
     /**
@@ -143,16 +159,21 @@ class PppoeManager
      */
     public function enableSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
+
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_ENABLE,
-            ['.id' => $secret['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::warning('pppoe', 'enableSecret', ['user' => $name]);
     }
 
     /**
@@ -163,16 +184,21 @@ class PppoeManager
      */
     public function disableSecret(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $secret = $this->getSecret($name);
 
         if (! $secret) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-secret', $name);
         }
+
+        $id = $this->extractId($secret, 'pppoe-secret');
 
         $this->client->query(
             self::CMD_SECRET_DISABLE,
-            ['.id' => $secret['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::warning('pppoe', 'disableSecret', ['user' => $name]);
     }
 
     // =========================================================
@@ -261,21 +287,25 @@ class PppoeManager
      */
     public function kickSession(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $sessions = $this->client->query(
             self::CMD_ACTIVE_PRINT,
             queries: ["name={$name}"]
         );
 
         if (empty($sessions)) {
-            return;
+            throw ResourceNotFoundException::for('pppoe-session', $name);
         }
 
         $session = $sessions[0];
+        $id = $this->extractId($session, 'pppoe-session');
 
         $this->client->query(
             self::CMD_ACTIVE_REMOVE,
-            ['.id' => $session['.id']]
+            ['.id' => $id]
         );
+
+        MikrotikLogger::critical('pppoe', 'kickSession', $name);
 
         // Dispatch event — listeners handle notifications/billing
         if (class_exists(\Illuminate\Support\Facades\Event::class)) {

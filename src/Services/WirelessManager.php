@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * WirelessManager
@@ -24,6 +27,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class WirelessManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_IFACE_PRINT = '/interface/wireless/print';
     private const CMD_REG_TABLE = '/interface/wireless/registration-table/print';
     private const CMD_ACCESS_LIST_PRINT = '/interface/wireless/access-list/print';
@@ -124,6 +130,7 @@ class WirelessManager
      */
     public function addToAccessList(string $mac, array $data = []): void
     {
+        $this->validateMac($mac, 'mac-address');
         $this->client->query(
             self::CMD_ACCESS_LIST_ADD,
             array_merge(['mac-address' => $mac], $data)
@@ -138,18 +145,21 @@ class WirelessManager
      */
     public function removeFromAccessList(string $mac): void
     {
+        $this->validateMac($mac, 'mac-address');
         $entries = $this->client->query(
             self::CMD_ACCESS_LIST_PRINT,
             queries: ["mac-address={$mac}"]
         );
 
         if (empty($entries)) {
-            return;
+            throw ResourceNotFoundException::for('wireless-access-list-entry', $mac);
         }
+
+        $id = $this->extractId($entries[0], 'wireless-access-list-entry');
 
         $this->client->query(
             self::CMD_ACCESS_LIST_REMOVE,
-            ['.id' => $entries[0]['.id']]
+            ['.id' => $id]
         );
     }
 }

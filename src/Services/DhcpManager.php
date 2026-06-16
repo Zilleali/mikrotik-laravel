@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * DhcpManager
@@ -21,6 +24,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class DhcpManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_LEASE_PRINT = '/ip/dhcp-server/lease/print';
     private const CMD_LEASE_SET = '/ip/dhcp-server/lease/set';
     private const CMD_LEASE_REMOVE = '/ip/dhcp-server/lease/remove';
@@ -104,15 +110,18 @@ class DhcpManager
      */
     public function makeLeaseStatic(string $mac): void
     {
+        $this->validateMac($mac, 'mac-address');
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {
-            return;
+            throw ResourceNotFoundException::for('dhcp-lease', $mac);
         }
+
+        $id = $this->extractId($lease, 'dhcp-lease');
 
         $this->client->query(
             self::CMD_LEASE_SET,
-            ['.id' => $lease['.id'], 'address' => $lease['address']]
+            ['.id' => $id, 'address' => $lease['address']]
         );
     }
 
@@ -124,15 +133,18 @@ class DhcpManager
      */
     public function deleteLease(string $mac): void
     {
+        $this->validateMac($mac, 'mac-address');
         $lease = $this->getLeaseByMac($mac);
 
         if (! $lease) {
-            return;
+            throw ResourceNotFoundException::for('dhcp-lease', $mac);
         }
+
+        $id = $this->extractId($lease, 'dhcp-lease');
 
         $this->client->query(
             self::CMD_LEASE_REMOVE,
-            ['.id' => $lease['.id']]
+            ['.id' => $id]
         );
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\RouterUserManager;
 
 function makeRouterUserClient(array $responses = []): RouterosClient
@@ -123,12 +124,12 @@ it('deletes router user without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when deleting non-existent user', function () {
+it('throws when deleting non-existent user', function () {
     $client = makeRouterUserClient(['/user/print' => []]);
     $manager = new RouterUserManager($client);
 
     expect(fn () => $manager->deleteUser('ghost'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── changePassword ───────────────────────────────────────────
@@ -211,4 +212,22 @@ it('returns false when user has no active session', function () {
     $manager = new RouterUserManager($client);
 
     expect($manager->isUserActive('admin'))->toBeFalse();
+});
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addUser throws on missing required key', function () {
+    $client = makeRouterUserClient();
+    $manager = new RouterUserManager($client);
+
+    expect(fn () => $manager->addUser(['name' => 'noc', 'password' => 'secret']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteUser throws on empty name', function () {
+    $client = makeRouterUserClient();
+    $manager = new RouterUserManager($client);
+
+    expect(fn () => $manager->deleteUser(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
 });

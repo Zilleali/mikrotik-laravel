@@ -1,6 +1,7 @@
 <?php
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\ArpManager;
 
 function makeArpClient(array $responses = []): RouterosClient
@@ -145,12 +146,12 @@ it('removes arp entry without throwing', function () {
         ->not->toThrow(\Exception::class);
 });
 
-it('does not throw when removing non-existent arp entry', function () {
+it('throws when removing non-existent arp entry', function () {
     $client = makeArpClient(['/ip/arp/print' => []]);
     $manager = new ArpManager($client);
 
     expect(fn () => $manager->removeArp('99.99.99.99'))
-        ->not->toThrow(\Exception::class);
+        ->toThrow(ResourceNotFoundException::class);
 });
 
 // ─── flushArpTable ────────────────────────────────────────────
@@ -199,4 +200,30 @@ it('returns null when ip has no mac in arp table', function () {
     $manager = new ArpManager($client);
 
     expect($manager->getMacByIp('99.99.99.99'))->toBeNull();
+});
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addStaticArp throws on invalid ip', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->addStaticArp('bad-ip', 'AA:BB:CC:DD:EE:FF', 'ether1'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addStaticArp throws on invalid mac', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->addStaticArp('192.168.1.1', 'not-a-mac', 'ether1'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeArp throws on invalid ip', function () {
+    $client = makeArpClient();
+    $manager = new ArpManager($client);
+
+    expect(fn () => $manager->removeArp('bad-ip'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
 });
