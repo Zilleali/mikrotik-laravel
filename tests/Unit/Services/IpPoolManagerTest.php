@@ -140,3 +140,21 @@ it('returns correct used address count', function () {
 
     expect($manager->getUsedCount('pppoe-pool'))->toBe(3);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('createPool throws on missing ranges key', function () {
+    $client = makeIpPoolClient();
+    $manager = new IpPoolManager($client);
+
+    expect(fn () => $manager->createPool(['name' => 'my-pool']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('createPool throws on missing name key', function () {
+    $client = makeIpPoolClient();
+    $manager = new IpPoolManager($client);
+
+    expect(fn () => $manager->createPool(['ranges' => '10.0.0.1-10.0.0.254']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

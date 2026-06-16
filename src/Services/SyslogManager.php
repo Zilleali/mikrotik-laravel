@@ -3,6 +3,9 @@
 namespace ZillEAli\MikrotikLaravel\Services;
 
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
+use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
+use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * SyslogManager
@@ -29,6 +32,9 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
  */
 class SyslogManager
 {
+    use HasIdValidation;
+    use HasValidation;
+
     private const CMD_ACTION_PRINT  = '/system/logging/action/print';
     private const CMD_ACTION_ADD    = '/system/logging/action/add';
     private const CMD_ACTION_SET    = '/system/logging/action/set';
@@ -126,6 +132,9 @@ class SyslogManager
         int     $remotePort = 514,
         ?string $comment    = null
     ): void {
+        $this->validateNotEmpty($name, 'name');
+        $this->validateIp($remoteIp, 'remote-ip');
+        $this->validatePort($remotePort, 'remote-port');
         $data = [
             'name'        => $name,
             'target'      => 'remote',
@@ -152,12 +161,14 @@ class SyslogManager
         $target = $this->getTarget($name);
 
         if (! $target) {
-            return;
+            throw ResourceNotFoundException::for('logging-target', $name);
         }
+
+        $id = $this->extractId($target, 'logging-target');
 
         $this->client->query(
             self::CMD_ACTION_SET,
-            array_merge(['.id' => $target['.id']], $data)
+            array_merge(['.id' => $id], $data)
         );
     }
 
@@ -174,12 +185,14 @@ class SyslogManager
         $target = $this->getTarget($name);
 
         if (! $target) {
-            return;
+            throw ResourceNotFoundException::for('logging-target', $name);
         }
+
+        $id = $this->extractId($target, 'logging-target');
 
         $this->client->query(
             self::CMD_ACTION_REMOVE,
-            ['.id' => $target['.id']]
+            ['.id' => $id]
         );
     }
 
@@ -221,6 +234,8 @@ class SyslogManager
      */
     public function addRule(string $topics, string $action): void
     {
+        $this->validateNotEmpty($topics, 'topics');
+        $this->validateNotEmpty($action, 'action');
         $this->client->query(self::CMD_RULE_ADD, [
             'topics' => $topics,
             'action' => $action,
@@ -243,13 +258,17 @@ class SyslogManager
                 ($rule['topics'] ?? '') === $topics &&
                 ($rule['action']  ?? '') === $action
             ) {
+                $id = $this->extractId($rule, 'logging-rule');
+
                 $this->client->query(
                     self::CMD_RULE_REMOVE,
-                    ['.id' => $rule['.id']]
+                    ['.id' => $id]
                 );
                 return;
             }
         }
+
+        throw ResourceNotFoundException::for('logging-rule', "{$topics}@{$action}");
     }
 
     /**

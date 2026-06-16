@@ -145,3 +145,21 @@ it('returns correct count of connected wireless clients', function () {
 
     expect($manager->getConnectedClientsCount())->toBe(3);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addToAccessList throws on invalid mac', function () {
+    $client = makeWirelessClient();
+    $manager = new WirelessManager($client);
+
+    expect(fn () => $manager->addToAccessList('not-a-mac'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeFromAccessList throws on invalid mac', function () {
+    $client = makeWirelessClient();
+    $manager = new WirelessManager($client);
+
+    expect(fn () => $manager->removeFromAccessList('not-a-mac'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
