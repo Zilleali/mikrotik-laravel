@@ -9,9 +9,14 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -46,6 +51,8 @@ jobs:
 
   test-laravel13:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: PHP 8.3 / Laravel 13.*
 
     steps:
@@ -76,6 +83,8 @@ jobs:
 
   phpstan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: PHPStan
 
     steps:
