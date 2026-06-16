@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/github/license/Zilleali/mikrotik-laravel)](LICENSE)
 [![MTCNA](https://img.shields.io/badge/MTCNA-Certified-009AC7)](https://zilleali.com)
 [![Wiki](https://img.shields.io/badge/Wiki-Documentation-blue)](https://github.com/Zilleali/mikrotik-laravel/wiki)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen)](https://phpstan.org)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FZilleali%2Fmikrotik-laravel&label=Visitors&labelColor=%23555555&countColor=%231D9E75&style=flat)
 
 > **MikroTik RouterOS API for Laravel** — Manage PPPoE, Hotspot, Queues, Firewall & System health from any Laravel application. Built by an [MTCNA-certified](https://zilleali.com) ISP engineer.
