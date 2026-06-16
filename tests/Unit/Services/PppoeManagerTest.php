@@ -200,3 +200,21 @@ it('throws when bulk kicking non-existent sessions', function () {
     expect(fn () => $manager->bulkKick(['ali-home', 'zain-fiber']))
         ->toThrow(ResourceNotFoundException::class);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('createSecret throws on missing required key', function () {
+    $client = mockClient();
+    $manager = new PppoeManager($client);
+
+    expect(fn () => $manager->createSecret(['name' => 'ali']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteSecret throws on empty name', function () {
+    $client = mockClient();
+    $manager = new PppoeManager($client);
+
+    expect(fn () => $manager->deleteSecret(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

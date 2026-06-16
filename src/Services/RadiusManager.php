@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * RadiusManager
@@ -30,6 +31,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class RadiusManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_PRINT = '/radius/print';
     private const CMD_ADD = '/radius/add';
@@ -95,6 +97,7 @@ class RadiusManager
      */
     public function addServer(array $data): void
     {
+        $this->validateRequiredKeys($data, ['address', 'secret'], 'radius-server');
         $this->client->query(self::CMD_ADD, $data);
     }
 
@@ -107,6 +110,7 @@ class RadiusManager
      */
     public function updateServer(string $address, array $data): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
@@ -129,6 +133,7 @@ class RadiusManager
      */
     public function removeServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
@@ -151,6 +156,7 @@ class RadiusManager
      */
     public function enableServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {
@@ -173,6 +179,7 @@ class RadiusManager
      */
     public function disableServer(string $address): void
     {
+        $this->validateNotEmpty($address, 'address');
         $server = $this->getServer($address);
 
         if (! $server) {

@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * RouteManager
@@ -30,6 +31,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class RouteManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_PRINT = '/ip/route/print';
     private const CMD_ADD = '/ip/route/add';
@@ -137,6 +139,8 @@ class RouteManager
         int     $distance = 1,
         ?string $comment = null
     ): void {
+        $this->validateCidr($destination, 'dst-address');
+        $this->validateIp($gateway, 'gateway');
         $data = [
             'dst-address' => $destination,
             'gateway' => $gateway,
@@ -159,6 +163,7 @@ class RouteManager
      */
     public function updateRoute(string $destination, array $data): void
     {
+        $this->validateCidr($destination, 'dst-address');
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
@@ -181,6 +186,7 @@ class RouteManager
      */
     public function removeRoute(string $destination): void
     {
+        $this->validateCidr($destination, 'dst-address');
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
@@ -203,6 +209,7 @@ class RouteManager
      */
     public function enableRoute(string $destination): void
     {
+        $this->validateCidr($destination, 'dst-address');
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {
@@ -228,6 +235,7 @@ class RouteManager
      */
     public function disableRoute(string $destination): void
     {
+        $this->validateCidr($destination, 'dst-address');
         $route = $this->getRouteByDestination($destination);
 
         if (! $route) {

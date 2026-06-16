@@ -178,3 +178,21 @@ it('returns false when radius server does not exist', function () {
 
     expect($manager->isServerActive('99.99.99.99'))->toBeFalse();
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addServer throws on missing required key', function () {
+    $client = makeRadiusClient();
+    $manager = new RadiusManager($client);
+
+    expect(fn () => $manager->addServer(['address' => '172.16.24.17']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('removeServer throws on empty address', function () {
+    $client = makeRadiusClient();
+    $manager = new RadiusManager($client);
+
+    expect(fn () => $manager->removeServer(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

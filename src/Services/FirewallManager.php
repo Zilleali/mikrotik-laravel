@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
@@ -26,6 +27,7 @@ use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 class FirewallManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     /**
      * RouterOS API commands
@@ -197,6 +199,7 @@ class FirewallManager
      */
     public function addToAddressList(string $ip, string $list, ?string $comment = null): void
     {
+        $this->validateNotEmpty($list, 'list');
         $data = [
             'address' => $ip,
             'list' => $list,
@@ -220,6 +223,7 @@ class FirewallManager
      */
     public function removeFromAddressList(string $ip, string $list): void
     {
+        $this->validateNotEmpty($list, 'list');
         $entries = $this->client->query(
             self::CMD_ADDRLIST_PRINT,
             queries: ["address={$ip}", "list={$list}"]

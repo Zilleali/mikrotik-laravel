@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 
 /**
  * RouterUserManager
@@ -37,6 +38,7 @@ use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 class RouterUserManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_USER_PRINT = '/user/print';
     private const CMD_USER_ADD = '/user/add';
@@ -99,6 +101,7 @@ class RouterUserManager
      */
     public function addUser(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password', 'group'], 'router-user');
         $this->client->query(self::CMD_USER_ADD, $data);
     }
 
@@ -111,6 +114,7 @@ class RouterUserManager
      */
     public function updateUser(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -136,6 +140,7 @@ class RouterUserManager
      */
     public function deleteUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -170,6 +175,7 @@ class RouterUserManager
      */
     public function enableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -194,6 +200,7 @@ class RouterUserManager
      */
     public function disableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {

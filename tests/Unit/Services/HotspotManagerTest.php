@@ -200,3 +200,21 @@ it('throws when disabling non-existent hotspot user', function () {
     expect(fn () => $manager->disableUser('user1'))
         ->toThrow(ResourceNotFoundException::class);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('createUser throws on missing required key', function () {
+    $client = makeHotspotClient();
+    $manager = new HotspotManager($client);
+
+    expect(fn () => $manager->createUser(['name' => 'bob']))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('deleteUser throws on empty name', function () {
+    $client = makeHotspotClient();
+    $manager = new HotspotManager($client);
+
+    expect(fn () => $manager->deleteUser(''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});

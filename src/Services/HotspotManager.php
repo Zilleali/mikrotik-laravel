@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
@@ -26,6 +27,7 @@ use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 class HotspotManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     /**
      * RouterOS API commands
@@ -95,6 +97,7 @@ class HotspotManager
      */
     public function createUser(array $data): void
     {
+        $this->validateRequiredKeys($data, ['name', 'password'], 'hotspot-user');
         $this->client->query(self::CMD_USER_ADD, $data);
     }
 
@@ -107,6 +110,7 @@ class HotspotManager
      */
     public function updateUser(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -129,6 +133,7 @@ class HotspotManager
      */
     public function deleteUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -153,6 +158,7 @@ class HotspotManager
      */
     public function enableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -175,6 +181,7 @@ class HotspotManager
      */
     public function disableUser(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $user = $this->getUser($name);
 
         if (! $user) {
@@ -211,6 +218,7 @@ class HotspotManager
      */
     public function kickHost(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $sessions = $this->client->query(
             self::CMD_ACTIVE_PRINT,
             queries: ["user={$name}"]

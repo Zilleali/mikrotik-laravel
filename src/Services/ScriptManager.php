@@ -5,6 +5,7 @@ namespace ZillEAli\MikrotikLaravel\Services;
 use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
+use ZillEAli\MikrotikLaravel\Support\HasValidation;
 use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
@@ -33,6 +34,7 @@ use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 class ScriptManager
 {
     use HasIdValidation;
+    use HasValidation;
 
     private const CMD_SCRIPT_PRINT = '/system/script/print';
     private const CMD_SCRIPT_ADD = '/system/script/add';
@@ -114,6 +116,8 @@ class ScriptManager
         string  $policy = 'read,write',
         ?string $comment = null
     ): void {
+        $this->validateNotEmpty($name, 'name');
+        $this->validateNotEmpty($source, 'source');
         $data = [
             'name' => $name,
             'source' => $source,
@@ -136,6 +140,7 @@ class ScriptManager
      */
     public function updateScript(string $name, array $data): void
     {
+        $this->validateNotEmpty($name, 'name');
         $script = $this->getScript($name);
 
         if (! $script) {
@@ -158,6 +163,7 @@ class ScriptManager
      */
     public function removeScript(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $script = $this->getScript($name);
 
         if (! $script) {
@@ -185,6 +191,7 @@ class ScriptManager
      */
     public function runScript(string $name): void
     {
+        $this->validateNotEmpty($name, 'name');
         $script = $this->getScript($name);
 
         if (! $script) {
@@ -260,6 +267,8 @@ class ScriptManager
         string  $startTime = '00:00:00',
         ?string $comment = null
     ): void {
+        $this->validateNotEmpty($name, 'name');
+        $this->validateNotEmpty($onEvent, 'on-event');
         $data = [
             'name' => $name,
             'on-event' => $onEvent,

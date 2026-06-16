@@ -212,3 +212,21 @@ it('returns correct script count', function () {
 
     expect($manager->getScriptCount())->toBe(3);
 });
+
+// ─── Validation ───────────────────────────────────────────────
+
+it('addScript throws on empty name', function () {
+    $client = makeScriptClient();
+    $manager = new ScriptManager($client);
+
+    expect(fn () => $manager->addScript('', '/ip dns flush'))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+it('addScript throws on empty source', function () {
+    $client = makeScriptClient();
+    $manager = new ScriptManager($client);
+
+    expect(fn () => $manager->addScript('flush-dns', ''))
+        ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
