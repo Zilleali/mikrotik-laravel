@@ -6,6 +6,7 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\HasValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * VpnManager
@@ -133,6 +134,8 @@ class VpnManager
             self::CMD_WG_PEER_REMOVE,
             ['.id' => $id]
         );
+
+        MikrotikLogger::critical('vpn', 'removeWireGuardPeer', $publicKey);
     }
 
     /**
