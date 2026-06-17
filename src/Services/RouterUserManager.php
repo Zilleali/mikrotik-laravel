@@ -6,6 +6,7 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Support\HasIdValidation;
 use ZillEAli\MikrotikLaravel\Support\HasValidation;
+use ZillEAli\MikrotikLaravel\Support\MikrotikLogger;
 
 /**
  * RouterUserManager
@@ -153,6 +154,8 @@ class RouterUserManager
             self::CMD_USER_REMOVE,
             ['.id' => $id]
         );
+
+        MikrotikLogger::critical('system', 'deleteUser', $name);
     }
 
     /**
@@ -165,6 +168,8 @@ class RouterUserManager
     public function changePassword(string $name, string $password): void
     {
         $this->updateUser($name, ['password' => $password]);
+
+        MikrotikLogger::critical('system', 'changePassword', $name);
     }
 
     /**

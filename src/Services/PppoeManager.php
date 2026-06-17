@@ -213,6 +213,8 @@ class PppoeManager
      */
     public function bulkEnable(array $names): void
     {
+        MikrotikLogger::critical('pppoe', 'bulkEnable', implode(', ', $names));
+
         foreach ($names as $name) {
             $this->enableSecret($name);
         }
@@ -226,6 +228,8 @@ class PppoeManager
      */
     public function bulkDisable(array $names): void
     {
+        MikrotikLogger::critical('pppoe', 'bulkDisable', implode(', ', $names));
+
         foreach ($names as $name) {
             $this->disableSecret($name);
         }
@@ -239,6 +243,8 @@ class PppoeManager
      */
     public function bulkKick(array $names): void
     {
+        MikrotikLogger::critical('pppoe', 'bulkKick', implode(', ', $names));
+
         foreach ($names as $name) {
             $this->kickSession($name);
         }
