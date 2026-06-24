@@ -218,7 +218,7 @@ class RouterosClient
     /**
      * Read the full response from the router until !done is received.
      *
-     * @return string[] Response words (excluding !re and !done markers)
+     * @return string[] Response words with sentence-terminating empty strings preserved as row delimiters
      *
      * @throws ApiException        On !trap or !fatal response
      * @throws ConnectionException On lost connection
@@ -242,8 +242,7 @@ class RouterosClient
                 throw new ApiException("RouterOS error: {$message}");
             }
 
-            // !re = data row marker — skip the marker itself, keep the data words
-            if ($word !== '' && $word !== '!re') {
+            if ($word !== '!re') {
                 $response[] = $word;
             }
         }
@@ -458,8 +457,8 @@ class RouterosClient
         $row = [];
 
         foreach ($raw as $word) {
-            // New row starts — save previous row if exists
-            if ($word === '!re') {
+            // Empty word = sentence terminator = end of this row
+            if ($word === '') {
                 if (! empty($row)) {
                     $result[] = $row;
                     $row = [];
@@ -473,11 +472,6 @@ class RouterosClient
                 $parts = explode('=', substr($word, 1), 2);
                 $row[$parts[0]] = $parts[1] ?? '';
             }
-        }
-
-        // Capture last row
-        if (! empty($row)) {
-            $result[] = $row;
         }
 
         return $result;
