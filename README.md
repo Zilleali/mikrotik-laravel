@@ -18,15 +18,13 @@
 📖 **[Full Documentation — GitHub Wiki](https://github.com/Zilleali/mikrotik-laravel/wiki)**
 
 | Page | Link |
-|---|---|
+| --- | --- |
 | Getting Started | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Getting-Started) |
 | Managers Reference | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Managers-Reference) |
 | Configuration | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Configuration) |
 | Multi-Router Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Multi-Router-Setup) |
 | SSL Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/SSL-Setup) |
 | Changelog | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Changelog) |
-
-
 
 ## Table of Contents
 
@@ -77,7 +75,7 @@
 ## Available Managers
 
 | Manager | Facade Method | Since |
-|---|---|---|
+| --- | --- | --- |
 | PppoeManager | `MikroTik::pppoe()` | v1.0.0 |
 | HotspotManager | `MikroTik::hotspot()` | v1.0.0 |
 | QueueManager | `MikroTik::queue()` | v1.0.0 |
@@ -133,7 +131,7 @@ IP → Services → api-ssl → enabled
 ## Requirements
 
 | Requirement | Version |
-|---|---|
+| --- | --- |
 | PHP | ^8.2 |
 | Laravel | ^11.0 \| ^12.0 |
 | RouterOS | 6.43+ \| 7.x |
