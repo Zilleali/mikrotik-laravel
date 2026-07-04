@@ -308,4 +308,28 @@ class HotspotManager
 
         return $vouchers;
     }
+
+    // =========================================================
+    // Streaming
+    // =========================================================
+
+    /**
+     * Stream hotspot users one row at a time.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamUsers(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_USER_PRINT);
+    }
+
+    /**
+     * Stream active hotspot sessions one row at a time.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamSessions(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_ACTIVE_PRINT);
+    }
 }

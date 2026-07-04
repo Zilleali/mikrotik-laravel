@@ -358,4 +358,37 @@ class PppoeManager
     {
         $this->client->query(self::CMD_PROFILE_ADD, $data);
     }
+
+    // =========================================================
+    // Streaming (memory-efficient for large deployments)
+    // =========================================================
+
+    /**
+     * Stream PPPoE secrets (users) one row at a time.
+     *
+     * Use instead of getSecrets() when managing tens of thousands of users.
+     * The generator fetches and yields one record per iteration without
+     * loading the full result set into memory.
+     *
+     * Usage:
+     *  foreach (MikroTik::pppoe()->streamSecrets() as $secret) {
+     *      echo $secret['name'];
+     *  }
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamSecrets(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_SECRET_PRINT);
+    }
+
+    /**
+     * Stream active PPPoE sessions one row at a time.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamSessions(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_ACTIVE_PRINT);
+    }
 }

@@ -4,12 +4,12 @@ use ZillEAli\MikrotikLaravel\Connections\RouterosClient;
 use ZillEAli\MikrotikLaravel\Exceptions\ResourceNotFoundException;
 use ZillEAli\MikrotikLaravel\Services\PppoeManager;
 
-// ─── Helper — mock client banana ──────────────────────────────
+// ─── Helper — mock client ─────────────────────────────────────
 
-function mockClient(array $responses = []): RouterosClient
+function mockClient(array $responses = [], array $streams = []): RouterosClient
 {
-    return new class ($responses) extends RouterosClient {
-        public function __construct(private array $responses)
+    return new class ($responses, $streams) extends RouterosClient {
+        public function __construct(private array $responses, private array $streams)
         {
             parent::__construct(host: '127.0.0.1');
         }
@@ -17,6 +17,13 @@ function mockClient(array $responses = []): RouterosClient
         public function query(string $command, array $params = [], array $queries = []): array
         {
             return $this->responses[$command] ?? [];
+        }
+
+        public function queryStream(string $command, array $params = [], array $queries = []): \Generator
+        {
+            foreach ($this->streams[$command] ?? [] as $row) {
+                yield $row;
+            }
         }
 
         public function send(array $words): array
@@ -217,4 +224,44 @@ it('deleteSecret throws on empty name', function () {
 
     expect(fn () => $manager->deleteSecret(''))
         ->toThrow(\ZillEAli\MikrotikLaravel\Exceptions\ValidationException::class);
+});
+
+// ─── Streaming ────────────────────────────────────────────────
+
+it('streamSecrets returns a generator', function () {
+    $client = mockClient(streams: [
+        '/ppp/secret/print' => [
+            ['name' => 'user1', 'password' => 'pass1'],
+            ['name' => 'user2', 'password' => 'pass2'],
+        ],
+    ]);
+    $manager = new PppoeManager($client);
+    $gen = $manager->streamSecrets();
+
+    expect($gen)->toBeInstanceOf(\Generator::class);
+
+    $rows = iterator_to_array($gen);
+    expect($rows)->toHaveCount(2)
+        ->and($rows[0]['name'])->toBe('user1')
+        ->and($rows[1]['name'])->toBe('user2');
+});
+
+it('streamSessions returns a generator', function () {
+    $client = mockClient(streams: [
+        '/ppp/active/print' => [
+            ['name' => 'ali-home', 'address' => '10.0.0.1'],
+        ],
+    ]);
+    $manager = new PppoeManager($client);
+    $rows = iterator_to_array($manager->streamSessions());
+
+    expect($rows)->toHaveCount(1)
+        ->and($rows[0]['name'])->toBe('ali-home');
+});
+
+it('streamSecrets yields nothing when no secrets exist', function () {
+    $client = mockClient(streams: ['/ppp/secret/print' => []]);
+    $manager = new PppoeManager($client);
+
+    expect(iterator_to_array($manager->streamSecrets()))->toBeEmpty();
 });

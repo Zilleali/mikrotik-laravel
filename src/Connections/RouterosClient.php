@@ -65,6 +65,54 @@ class RouterosClient
     ) {
     }
 
+    /**
+     * Socket read timeout in seconds (separate from TCP connect timeout).
+     */
+    protected int $socketTimeout = 30;
+
+    /**
+     * Whether the socket should run in blocking mode.
+     */
+    protected bool $socketBlocking = true;
+
+    /**
+     * Whether to throw ConnectionException on socket read timeout.
+     * When false, a timed-out read returns an empty string instead.
+     */
+    protected bool $throwTimeoutException = true;
+
+    /**
+     * Apply runtime socket configuration options.
+     * Must be called before connect().
+     *
+     * @param  array<string, mixed> $options Supported keys: socket_timeout, socket_blocking, throw_timeout_exception
+     * @return static
+     */
+    public function configure(array $options): static
+    {
+        if (isset($options['socket_timeout'])) {
+            $this->socketTimeout = (int) $options['socket_timeout'];
+        }
+        if (isset($options['socket_blocking'])) {
+            $this->socketBlocking = (bool) $options['socket_blocking'];
+        }
+        if (isset($options['throw_timeout_exception'])) {
+            $this->throwTimeoutException = (bool) $options['throw_timeout_exception'];
+        }
+
+        return $this;
+    }
+
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
+    public function getPort(): int
+    {
+        return $this->port;
+    }
+
     // =========================================================
     // Connection Management
     // =========================================================
@@ -91,7 +139,8 @@ class RouterosClient
             );
         }
 
-        stream_set_timeout($this->socket, $this->timeout);
+        stream_set_blocking($this->socket, $this->socketBlocking);
+        stream_set_timeout($this->socket, $this->socketTimeout);
 
         $this->connected = true;
 
@@ -374,7 +423,20 @@ class RouterosClient
      */
     protected function decodeLength(): int
     {
-        $firstByte = ord(fread($this->socket, 1));
+        $raw = fread($this->socket, 1);
+
+        if ($raw === false || $raw === '') {
+            $meta = stream_get_meta_data($this->socket);
+            if ($meta['timed_out']) {
+                if ($this->throwTimeoutException) {
+                    throw new ConnectionException('Socket read timed out after ' . $this->socketTimeout . 's');
+                }
+                return 0;
+            }
+            throw new ConnectionException('Connection lost while reading from router');
+        }
+
+        $firstByte = ord($raw);
 
         // 1-byte: 0xxxxxxx
         if ($firstByte < 0x80) {
@@ -475,6 +537,109 @@ class RouterosClient
         }
 
         return $result;
+    }
+
+    /**
+     * Stream results row-by-row via a PHP Generator.
+     *
+     * Ideal for large datasets (10k+ PPPoE secrets, DHCP leases)
+     * where loading the full result into memory is undesirable.
+     *
+     * Usage:
+     *  foreach ($client->queryStream('/ppp/secret/print') as $row) {
+     *      // $row is ['name' => '...', 'password' => '...', ...]
+     *      process($row);
+     *  }
+     *
+     * Note: the command is sent when the generator is first iterated,
+     * not when queryStream() is called. Do not mix with other queries
+     * on the same client before fully consuming the generator.
+     *
+     * @param  string   $command RouterOS command
+     * @param  string[] $params  Key-value pairs sent as =key=value
+     * @param  string[] $queries Filter queries sent as ?key=value
+     * @return \Generator<int, array<string, string>>
+     *
+     * @throws ConnectionException
+     * @throws ApiException
+     */
+    public function queryStream(string $command, array $params = [], array $queries = []): \Generator
+    {
+        if (! $this->isConnected()) {
+            throw new ConnectionException('Not connected. Call connect() first.');
+        }
+
+        $words = [$command];
+        foreach ($params as $key => $value) {
+            $words[] = "={$key}={$value}";
+        }
+        foreach ($queries as $query) {
+            $words[] = "?{$query}";
+        }
+
+        // writeSentence() is called on first iteration (before the first yield)
+        $this->writeSentence($words);
+
+        $row = [];
+
+        while (true) {
+            $word = $this->readWord();
+
+            if ($word === '!done') {
+                if (! empty($row)) {
+                    yield $row;
+                }
+                break;
+            }
+
+            if (str_starts_with($word, '!trap') || str_starts_with($word, '!fatal')) {
+                $message = $this->readTrapMessage();
+                throw new ApiException("RouterOS error: {$message}");
+            }
+
+            if ($word === '!re') {
+                if (! empty($row)) {
+                    yield $row;
+                    $row = [];
+                }
+                continue;
+            }
+
+            if ($word === '') {
+                if (! empty($row)) {
+                    yield $row;
+                    $row = [];
+                }
+                continue;
+            }
+
+            if (str_starts_with($word, '=')) {
+                $parts = explode('=', substr($word, 1), 2);
+                $row[$parts[0]] = $parts[1] ?? '';
+            }
+        }
+    }
+
+    /**
+     * Send a command and return the raw unprocessed response words.
+     *
+     * Useful for diagnostics, protocol inspection, and testing.
+     *
+     * @param  string   $command RouterOS command
+     * @param  string[] $params  Key-value pairs
+     * @return string[]          Raw response words including !re, !done markers
+     *
+     * @throws ConnectionException
+     * @throws ApiException
+     */
+    public function sendRaw(string $command, array $params = []): array
+    {
+        $words = [$command];
+        foreach ($params as $key => $value) {
+            $words[] = "={$key}={$value}";
+        }
+
+        return $this->send($words);
     }
 
     // =========================================================

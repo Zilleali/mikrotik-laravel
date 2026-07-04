@@ -11,6 +11,8 @@ use ZillEAli\MikrotikLaravel\Events\RouterUnreachable;
 use ZillEAli\MikrotikLaravel\Events\SessionCreated;
 use ZillEAli\MikrotikLaravel\Events\SessionDisconnected;
 use ZillEAli\MikrotikLaravel\Exceptions\ConnectionException;
+use ZillEAli\MikrotikLaravel\Services\DiagnosticsManager;
+use ZillEAli\MikrotikLaravel\Services\ExportManager;
 use ZillEAli\MikrotikLaravel\Services\ArpManager;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
@@ -128,6 +130,12 @@ class MikrotikManager
                 timeout:  $cfg['timeout'] ?? 10,
             );
         }
+
+        $client->configure([
+            'socket_timeout'          => $this->config['socket_timeout'] ?? 30,
+            'socket_blocking'         => $this->config['socket_blocking'] ?? true,
+            'throw_timeout_exception' => $this->config['throw_timeout_exception'] ?? true,
+        ]);
 
         $attempts = $this->config['retry_attempts'] ?? 1;
         $delay = $this->config['retry_delay'] ?? 1000;
@@ -400,6 +408,37 @@ class MikrotikManager
     public function sessionMonitor(): SessionMonitor
     {
         return new SessionMonitor($this->getClient());
+    }
+
+    /**
+     * SSH-based config export and diff manager.
+     *
+     * Requires SSH service enabled on the router and an SSH private key
+     * configured via MIKROTIK_SSH_KEY / ssh_private_key in config.
+     *
+     * @return ExportManager
+     */
+    public function export(): ExportManager
+    {
+        $cfg = $this->getRouterConfig($this->resolveAndResetRouter());
+
+        return new ExportManager(
+            host:          $cfg['host'],
+            sshPort:       (int) ($this->config['ssh_port'] ?? 22),
+            sshUser:       $cfg['username'] ?? 'admin',
+            sshPrivateKey: $this->config['ssh_private_key'] ?? '~/.ssh/id_rsa',
+            sshTimeout:    (int) ($this->config['ssh_timeout'] ?? 30),
+        );
+    }
+
+    /**
+     * Connection diagnostics: ping, latency, raw API inspection.
+     *
+     * @return DiagnosticsManager
+     */
+    public function diagnostics(): DiagnosticsManager
+    {
+        return new DiagnosticsManager($this->getClient());
     }
 
     // =========================================================

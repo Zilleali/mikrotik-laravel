@@ -235,4 +235,27 @@ class SessionMonitor
 
         return $minutes;
     }
+
+    // =========================================================
+    // Streaming
+    // =========================================================
+
+    /**
+     * Stream all active sessions (PPPoE + Hotspot combined) one row at a time.
+     *
+     * Yields each PPPoE session first, then each Hotspot session,
+     * with a 'type' key injected per row.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamActiveSessions(): \Generator
+    {
+        foreach ($this->client->queryStream(self::CMD_PPPOE_ACTIVE) as $row) {
+            yield array_merge($row, ['type' => 'pppoe']);
+        }
+
+        foreach ($this->client->queryStream(self::CMD_HOTSPOT_ACTIVE) as $row) {
+            yield array_merge($row, ['type' => 'hotspot']);
+        }
+    }
 }
