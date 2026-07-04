@@ -7,3 +7,5 @@ composer.phar
 .php-cs-fixer.cache
 .vscode/
 .idea
+.claude
+.claude/

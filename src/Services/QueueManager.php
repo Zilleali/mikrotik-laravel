@@ -262,4 +262,18 @@ class QueueManager
     {
         $this->client->query(self::CMD_TREE_ADD, $data);
     }
+
+    // =========================================================
+    // Streaming
+    // =========================================================
+
+    /**
+     * Stream simple queues one row at a time.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamQueues(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_SIMPLE_PRINT);
+    }
 }

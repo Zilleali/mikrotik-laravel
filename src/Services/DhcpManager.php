@@ -161,4 +161,18 @@ class DhcpManager
     {
         return $this->client->query(self::CMD_SERVER_PRINT);
     }
+
+    // =========================================================
+    // Streaming
+    // =========================================================
+
+    /**
+     * Stream DHCP leases one row at a time.
+     *
+     * @return \Generator<int, array<string, string>>
+     */
+    public function streamLeases(): \Generator
+    {
+        return $this->client->queryStream(self::CMD_LEASE_PRINT);
+    }
 }

@@ -35,6 +35,37 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Socket Options
+    |--------------------------------------------------------------------------
+    |
+    | socket_timeout     — How long to wait for a response word from the router (seconds).
+    | socket_blocking    — Whether the socket runs in blocking mode. Set false only for
+    |                      health-check use cases with a very short socket_timeout.
+    | throw_timeout_exception — If true, a socket timeout throws ConnectionException.
+    |                           If false, timeout returns an empty result gracefully.
+    |
+    */
+
+    'socket_timeout' => (int) env('MIKROTIK_SOCKET_TIMEOUT', 30),
+    'socket_blocking' => (bool) env('MIKROTIK_SOCKET_BLOCKING', true),
+    'throw_timeout_exception' => (bool) env('MIKROTIK_THROW_TIMEOUT_EXCEPTION', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | SSH Export Options
+    |--------------------------------------------------------------------------
+    |
+    | Used by ExportManager to fetch router config via SSH (/export command).
+    | Requires SSH service enabled on the router and an SSH private key.
+    |
+    */
+
+    'ssh_port' => (int) env('MIKROTIK_SSH_PORT', 22),
+    'ssh_private_key' => env('MIKROTIK_SSH_KEY', '~/.ssh/id_rsa'),
+    'ssh_timeout' => (int) env('MIKROTIK_SSH_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
     | Multiple Routers
     |--------------------------------------------------------------------------
     |
