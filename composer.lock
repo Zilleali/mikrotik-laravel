@@ -3099,16 +3099,16 @@
         },
         {
             "name": "spatie/ssh",
-            "version": "1.13.1",
+            "version": "1.13.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ssh.git",
-                "reference": "3d2444f72d2c6ec4d12a8d2f03e0b6f5a06114e1"
+                "reference": "3335ab102d1ad3e2cabc4e1079cd8b03f59bcd64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ssh/zipball/3d2444f72d2c6ec4d12a8d2f03e0b6f5a06114e1",
-                "reference": "3d2444f72d2c6ec4d12a8d2f03e0b6f5a06114e1",
+                "url": "https://api.github.com/repos/spatie/ssh/zipball/3335ab102d1ad3e2cabc4e1079cd8b03f59bcd64",
+                "reference": "3335ab102d1ad3e2cabc4e1079cd8b03f59bcd64",
                 "shasum": ""
             },
             "require": {
@@ -3146,7 +3146,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ssh/issues",
-                "source": "https://github.com/spatie/ssh/tree/1.13.1"
+                "source": "https://github.com/spatie/ssh/tree/1.13.2"
             },
             "funding": [
                 {
@@ -3154,7 +3154,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-11-23T11:35:56+00:00"
+            "time": "2026-07-24T12:17:04+00:00"
         },
         {
             "name": "symfony/clock",
