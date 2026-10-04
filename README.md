@@ -45,7 +45,7 @@
 - **Laravel Pulse Card** — router health dashboard widget *(v1.7.0)*
 - **SSL Connection** — TLS encrypted API (port 8729)
 - **Multi-Router Support** — manage multiple routers from one app
-- **Fleet Management** — health, session lookup and kicks across every router at once, router groups *(unreleased)*
+- **Fleet Management** — health, session lookup and kicks across every router at once, router groups *(v1.8.0)*
 - **Caching, Retry, Rate Limiting** — production-ready reliability
 - **Laravel Events** — SessionCreated, SessionDisconnected, RouterUnreachable
 - **Artisan Commands** — mikrotik:ping, mikrotik:sync, mikrotik:monitor, mikrotik:fleet
@@ -80,7 +80,7 @@
 | UsageTracker | `MikroTik::usageTracker()` | v1.2.0 |
 | DiagnosticsManager | `MikroTik::diagnostics()` | v1.7.0 |
 | ExportManager | `MikroTik::export()` | v1.7.0 |
-| FleetManager | `MikroTik::fleet()` | unreleased |
+| FleetManager | `MikroTik::fleet()` | v1.8.0 |
 
 ---
 
@@ -139,7 +139,7 @@ MikroTik::queue()->setLimit('ali-home', '10M', '10M');
 // Multi-router
 MikroTik::router('branch')->pppoe()->getActiveSessions();
 
-// Fleet — every router at once (unreleased)
+// Fleet — every router at once (v1.8.0)
 MikroTik::fleet()->health();                          // FleetResult per router
 MikroTik::fleet()->findPppoeSession('ali-home');      // ['branch' => [...session]]
 MikroTik::fleet()->group('north')->totalActiveSessions();
