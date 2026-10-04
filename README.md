@@ -23,9 +23,11 @@
 | Managers Reference | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Managers-Reference) |
 | Configuration | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Configuration) |
 | Multi-Router Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Multi-Router-Setup) |
+| Fleet Management *(v1.8.0)* | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Fleet-Management) |
+| Artisan Commands | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Artisan-Commands) |
 | SSL Setup | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/SSL-Setup) |
-| Testing with MikrotikFake | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Testing) |
-| Laravel Pulse Integration | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Pulse-Integration) |
+| Testing, Pulse, Diagnostics, SSH Export | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/v1.7.0) |
+| Versions & Upgrade Notes | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Versions) |
 | Changelog | [→ Read](https://github.com/Zilleali/mikrotik-laravel/wiki/Changelog) |
 
 ---
@@ -44,8 +46,10 @@
 - **MikrotikFake** — drop-in test helper, zero manual mocking *(v1.7.0)*
 - **Laravel Pulse Card** — router health dashboard widget *(v1.7.0)*
 - **SSL Connection** — TLS encrypted API (port 8729)
-- **Multi-Router Support** — manage multiple routers from one app
+- **Multi-Router Support** — named routers, `router()` per call or `on()` pinned *(v1.8.0)*
 - **Fleet Management** — health, session lookup and kicks across every router at once, router groups *(v1.8.0)*
+- **Input Validation & Typed Exceptions** — bad input rejected before it reaches the router *(v1.5.0)*
+- **Centralized Logging** — structured logs, audit trail for destructive actions *(v1.6.0)*
 - **Caching, Retry, Rate Limiting** — production-ready reliability
 - **Laravel Events** — SessionCreated, SessionDisconnected, RouterUnreachable
 - **Artisan Commands** — mikrotik:ping, mikrotik:sync, mikrotik:monitor, mikrotik:fleet
@@ -93,7 +97,7 @@
 | RouterOS | 6.43+ \| 7.x |
 | MikroTik API | Port 8728 (plain) or 8729 (SSL) |
 
-Optional: `laravel/pulse: ^1.0` for the Pulse card — `spatie/ssh: ^1.8` for ExportManager.
+Optional: `laravel/pulse: ^1.0` for the Pulse card. ExportManager uses SSH (`spatie/ssh`, installed automatically) and needs SSH enabled on the router.
 
 ---
 
@@ -122,6 +126,7 @@ MIKROTIK_PASS=your_password
 
 ```php
 use ZillEAli\MikrotikLaravel\Facades\MikroTik;
+use ZillEAli\MikrotikLaravel\Testing\MikrotikFake;
 
 // PPPoE
 $sessions = MikroTik::pppoe()->getActiveSessions();
@@ -137,7 +142,9 @@ $cpu = MikroTik::system()->getCpuLoad();
 MikroTik::queue()->setLimit('ali-home', '10M', '10M');
 
 // Multi-router
-MikroTik::router('branch')->pppoe()->getActiveSessions();
+MikroTik::router('branch')->pppoe()->getActiveSessions();   // one call
+$branch = MikroTik::on('branch');                            // pinned (v1.8.0)
+$branch->system()->getCpuLoad();
 
 // Fleet — every router at once (v1.8.0)
 MikroTik::fleet()->health();                          // FleetResult per router
