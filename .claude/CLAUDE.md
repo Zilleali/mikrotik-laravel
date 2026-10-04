@@ -84,7 +84,7 @@ bandwidth control), not just generic API wrapping.
 **GitHub:** <https://github.com/Zilleali/mikrotik-laravel>
 **Docs:** <https://github.com/Zilleali/mikrotik-laravel/wiki> — the Wiki is
 the canonical documentation; README is a short landing page only
-**Current stable:** v1.7.0 (2026-07-04) — verify with
+**Current stable:** v1.8.0 (2026-10-04) — verify with
 `git tag --sort=-v:refname` before stating a version anywhere
 **In progress:** nothing — next milestone not yet decided
 
@@ -96,7 +96,7 @@ the canonical documentation; README is a short landing page only
 - Laravel ^11.0 | ^12.0 | ^13.0 (`illuminate/support`)
 - `spatie/ssh` ^1.8 — required, used by ExportManager
 - `laravel/pulse` ^1.0 — optional (require-dev + suggest), Pulse card only
-- Pest v3 (tests) — 489 tests, all mock-based, no real router needed
+- Pest v3 (tests) — 540 tests, all mock-based, no real router needed
 - PHPStan level 5 (zero errors required)
 - PHP CS Fixer
 - Orchestra Testbench
@@ -138,7 +138,8 @@ src/
 │   └── InvalidRouterResponseException.php
 ├── Filament/Widgets/            — data provider classes, NOT real widgets
 ├── Http/                        — empty scaffolding (Controllers, Middleware)
-└── Commands/                    — mikrotik:ping, mikrotik:sync, mikrotik:monitor
+└── Commands/                    — mikrotik:ping, mikrotik:sync, mikrotik:monitor,
+                                   mikrotik:fleet
 resources/views/pulse/router-health.blade.php
 config/mikrotik.php
 tests/Unit/                      — mirrors src/ structure
@@ -174,7 +175,7 @@ tests/Unit/                      — mirrors src/ structure
 | `MikroTik::usageTracker()` | UsageTracker | v1.2.0 |
 | `MikroTik::diagnostics()` | DiagnosticsManager | v1.7.0 |
 | `MikroTik::export()` | ExportManager | v1.7.0 |
-| `MikroTik::fleet()` | FleetManager | unreleased |
+| `MikroTik::fleet()` | FleetManager | v1.8.0 |
 
 Adding a new manager touches ALL of these:
 
@@ -298,7 +299,7 @@ Work is finished only when ALL of these pass:
 
 ```bash
 composer analyse    # phpstan level 5 — zero errors
-composer test       # pest, all ~489 tests green
+composer test       # pest, all ~540 tests green
 ```
 
 Plus:
