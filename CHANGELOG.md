@@ -7,6 +7,44 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Added
+
+#### FleetManager — `MikroTik::fleet()` (multi-router management)
+
+- `each(callback)` — run any operation on every router; returns a `FleetResult`, one unreachable site never aborts the run
+- `health()` — identity, version, board, CPU, memory %, uptime and API latency for every router
+- `reachable()` / `unreachable()` — split the fleet by live API reachability
+- `activeSessionCounts()` / `totalActiveSessions()` — PPPoE + Hotspot counts per router and fleet-wide
+- `findPppoeSession(username)` / `findSessionByIp(ip)` / `findHotspotSession(username)` — locate which NAS a subscriber is on
+- `kickPppoeEverywhere(username)` — disconnect a subscriber on every router they are online on (logged at critical)
+- `only(...)` / `except(...)` / `group(name)` — target a subset; routers are tagged via a `groups` key in `config.routers`
+- `fleet.include_default` config (`MIKROTIK_FLEET_INCLUDE_DEFAULT`) — skip the top-level router when it is duplicated in `routers`
+
+#### Router Scoping
+
+- `MikroTik::on('branch')` — manager pinned to one router for any number of calls (unlike `router()`, which resets after one call); shares the connection pool
+- `MikroTik::getRouterNames(?group)` — list configured routers, optionally by group
+- `MikroTik::currentRouterName()` — router the next call will target
+
+#### `FleetResult`
+
+- `successful()`, `failed()`, `get()`, `error()`, `succeededRouters()`, `failedRouters()`, `hasFailures()`, `map()`, `toArray()`; countable and iterable
+
+#### Artisan
+
+- `php artisan mikrotik:fleet` — one-screen health + sessions table for all routers; `--group`, repeatable `--router`, `--json`; exits non-zero if any router is down
+
+### Fixed
+
+- `mikrotik:sync --router=X` and `mikrotik:monitor --router=X` only sent the first query to router X — system resources, identity and hotspot data came from the default router and were cached under X's key
+- Default router ignored `MIKROTIK_SSL_VERIFY` and `MIKROTIK_SSL_CA_CERT` — `verify_peer` / `ca_cert_path` were dropped from its resolved config
+- `SessionCreated` / `SessionDisconnected` dispatched from a pinned manager now carry the correct router name
+- Facade docblock was missing `diagnostics()` and `export()`, so IDEs and static analysis could not resolve them
+
+---
+
 ## [1.7.0] — 2026-07-04
 
 ### Added

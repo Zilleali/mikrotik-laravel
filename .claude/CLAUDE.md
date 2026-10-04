@@ -115,7 +115,7 @@ src/
 │   ├── RouterosClient.php       — TCP socket + queryStream() Generator
 │   ├── RouterosClientSSL.php    — TLS port 8729
 │   └── ConnectionPool.php       — persistent connections
-├── Services/                    — 24 managers (see table below)
+├── Services/                    — 25 managers (see table below)
 ├── Support/
 │   ├── CachingProxy.php         — TTL caching
 │   ├── RateLimiter.php          — API throttle
@@ -146,7 +146,7 @@ tests/Unit/                      — mirrors src/ structure
 
 ---
 
-## 24 Service Managers
+## 25 Service Managers
 
 | Facade | Manager | Since |
 | --- | --- | --- |
@@ -174,6 +174,7 @@ tests/Unit/                      — mirrors src/ structure
 | `MikroTik::usageTracker()` | UsageTracker | v1.2.0 |
 | `MikroTik::diagnostics()` | DiagnosticsManager | v1.7.0 |
 | `MikroTik::export()` | ExportManager | v1.7.0 |
+| `MikroTik::fleet()` | FleetManager | unreleased |
 
 Adding a new manager touches ALL of these:
 
