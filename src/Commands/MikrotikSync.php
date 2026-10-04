@@ -92,11 +92,9 @@ class MikrotikSync extends Command
         $this->line("  Syncing <fg=yellow>[{$routerName}]</> ...");
 
         try {
-            $manager = app(MikrotikManager::class);
-
-            if ($routerName !== 'default') {
-                $manager->router($routerName);
-            }
+            // on() pins every call below to this router — router() would
+            // reset after the first manager call and hit 'default' instead.
+            $manager = app(MikrotikManager::class)->on($routerName);
 
             // Sync PPPoE active sessions
             $sessions = $manager->pppoe()->getActiveSessions();

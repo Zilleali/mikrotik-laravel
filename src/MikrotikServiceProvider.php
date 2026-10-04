@@ -3,6 +3,7 @@
 namespace ZillEAli\MikrotikLaravel;
 
 use Illuminate\Support\ServiceProvider;
+use ZillEAli\MikrotikLaravel\Commands\MikrotikFleet;
 use ZillEAli\MikrotikLaravel\Commands\MikrotikMonitor;
 use ZillEAli\MikrotikLaravel\Commands\MikrotikPing;
 use ZillEAli\MikrotikLaravel\Commands\MikrotikSync;
@@ -67,6 +68,7 @@ class MikrotikServiceProvider extends ServiceProvider
                 MikrotikPing::class,
                 MikrotikSync::class,
                 MikrotikMonitor::class,
+                MikrotikFleet::class,
             ]);
         }
 
