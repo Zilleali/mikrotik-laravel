@@ -74,6 +74,11 @@ return [
     |
     */
 
+    /*
+    | Optional per-router 'groups' => ['north', 'fiber'] tags let you target a
+    | subset: MikroTik::fleet()->group('north')->health()
+    */
+
     'routers' => [
         'main' => [
             'host' => env('MIKROTIK_MAIN_HOST', '192.168.88.1'),
@@ -89,6 +94,22 @@ return [
             'password' => env('MIKROTIK_BRANCH_PASS', ''),
             'timeout' => 10,
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fleet (multi-router operations)
+    |--------------------------------------------------------------------------
+    |
+    | MikroTik::fleet() runs the same operation on every router above.
+    | include_default — also include the top-level 'default' router. Set to
+    |                   false when the default router is duplicated in
+    |                   'routers' so it isn't queried (and counted) twice.
+    |
+    */
+
+    'fleet' => [
+        'include_default' => (bool) env('MIKROTIK_FLEET_INCLUDE_DEFAULT', true),
     ],
 
 ];

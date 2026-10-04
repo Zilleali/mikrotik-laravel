@@ -18,6 +18,7 @@ use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
 use ZillEAli\MikrotikLaravel\Services\DnsManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
+use ZillEAli\MikrotikLaravel\Services\FleetManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
@@ -46,6 +47,8 @@ use ZillEAli\MikrotikLaravel\Support\CachingProxy;
  * Accessed via Facade:
  *  MikroTik::pppoe()->getActiveSessions()
  *  MikroTik::router('branch')->hotspot()->getActiveHosts()
+ *  MikroTik::on('branch')->system()->getResources()   // pinned, reusable
+ *  MikroTik::fleet()->health()                         // every router at once
  *
  * @package ZillEAli\MikrotikLaravel
  * @author  Zill E Ali <zilleali1245@gmail.com>
@@ -62,6 +65,11 @@ class MikrotikManager
      * Currently selected router name.
      */
     protected string $currentRouter = 'default';
+
+    /**
+     * Router this instance is permanently bound to (set by on()).
+     */
+    protected ?string $pinnedRouter = null;
 
     /**
      * @param array<string, mixed> $config Full mikrotik config array
@@ -88,6 +96,75 @@ class MikrotikManager
         $this->currentRouter = $name;
 
         return $this;
+    }
+
+    /**
+     * Get a manager instance permanently bound to a named router.
+     *
+     * Unlike router(), the selection does not reset after one call, so the
+     * returned instance can be reused for several manager calls. Shares the
+     * connection pool with this instance.
+     *
+     *  $branch = MikroTik::on('branch');
+     *  $branch->system()->getResources();
+     *  $branch->pppoe()->getActiveSessions();
+     *
+     * @param  string $name Router name from config.routers, or 'default'
+     * @return static
+     * @throws ConnectionException If router name not found in config
+     */
+    public function on(string $name): static
+    {
+        $this->getRouterConfig($name);
+
+        $scoped = clone $this;
+        $scoped->pinnedRouter = $name;
+        $scoped->currentRouter = $name;
+
+        return $scoped;
+    }
+
+    /**
+     * Name of the router the next manager call will target.
+     *
+     * @return string
+     */
+    public function currentRouterName(): string
+    {
+        return $this->pinnedRouter ?? $this->currentRouter;
+    }
+
+    /**
+     * Get all configured router names.
+     *
+     * Includes 'default' first, followed by every key in config.routers.
+     * Pass a group to return only routers tagged with it via their
+     * 'groups' config key (the default router is never part of a group).
+     *
+     * @param  string|null $group Optional group filter e.g. 'north', 'fiber'
+     * @return list<string>
+     */
+    public function getRouterNames(?string $group = null): array
+    {
+        /** @var array<string, array<string, mixed>> $routers */
+        $routers = $this->config['routers'] ?? [];
+
+        if ($group !== null) {
+            $names = [];
+
+            foreach ($routers as $name => $cfg) {
+                if (in_array($group, (array) ($cfg['groups'] ?? []), true)) {
+                    $names[] = (string) $name;
+                }
+            }
+
+            return $names;
+        }
+
+        return array_values(array_unique(array_merge(
+            ['default'],
+            array_map('strval', array_keys($routers)),
+        )));
     }
 
     // =========================================================
@@ -152,6 +229,10 @@ class MikrotikManager
      */
     protected function resolveAndResetRouter(): string
     {
+        if ($this->pinnedRouter !== null) {
+            return $this->pinnedRouter;
+        }
+
         $name = $this->currentRouter;
         $this->currentRouter = 'default';
 
@@ -233,6 +314,9 @@ class MikrotikManager
                 'username' => $this->config['username'] ?? 'admin',
                 'password' => $this->config['password'] ?? '',
                 'timeout' => $this->config['timeout'] ?? 10,
+                'ssl' => $this->config['ssl'] ?? false,
+                'verify_peer' => $this->config['verify_peer'] ?? false,
+                'ca_cert_path' => $this->config['ca_cert_path'] ?? null,
             ];
         }
 
@@ -441,6 +525,23 @@ class MikrotikManager
         return new DiagnosticsManager($this->getClient());
     }
 
+    /**
+     * Multi-router fleet operations — run the same task on every router.
+     *
+     *  MikroTik::fleet()->health()
+     *  MikroTik::fleet()->group('north')->findPppoeSession('ali-home')
+     *  MikroTik::fleet()->each(fn ($router) => $router->queue()->getSimpleQueues())
+     *
+     * @return FleetManager
+     */
+    public function fleet(): FleetManager
+    {
+        return new FleetManager(
+            $this,
+            (bool) ($this->config['fleet']['include_default'] ?? true),
+        );
+    }
+
     // =========================================================
     // Caching
     // =========================================================
@@ -479,7 +580,7 @@ class MikrotikManager
         Event::dispatch(new SessionCreated(
             username:   $username,
             ip:         $ip,
-            router:     $this->currentRouter,
+            router:     $this->currentRouterName(),
             service:    $service,
             macAddress: $mac,
         ));
@@ -502,7 +603,7 @@ class MikrotikManager
     ): void {
         Event::dispatch(new SessionDisconnected(
             username: $username,
-            router:   $this->currentRouter,
+            router:   $this->currentRouterName(),
             ip:       $ip,
             uptime:   $uptime,
             reason:   $reason,

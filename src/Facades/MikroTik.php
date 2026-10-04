@@ -8,8 +8,11 @@ use ZillEAli\MikrotikLaravel\MikrotikManager;
 use ZillEAli\MikrotikLaravel\Services\ArpManager;
 use ZillEAli\MikrotikLaravel\Services\BridgeManager;
 use ZillEAli\MikrotikLaravel\Services\DhcpManager;
+use ZillEAli\MikrotikLaravel\Services\DiagnosticsManager;
 use ZillEAli\MikrotikLaravel\Services\DnsManager;
+use ZillEAli\MikrotikLaravel\Services\ExportManager;
 use ZillEAli\MikrotikLaravel\Services\FirewallManager;
+use ZillEAli\MikrotikLaravel\Services\FleetManager;
 use ZillEAli\MikrotikLaravel\Services\HotspotManager;
 use ZillEAli\MikrotikLaravel\Services\InterfaceManager;
 use ZillEAli\MikrotikLaravel\Services\IpAddressManager;
@@ -33,6 +36,12 @@ use ZillEAli\MikrotikLaravel\Support\CachingProxy;
  * MikroTik Facade
  *
  * @method static MikrotikManager router(string $name)
+ * @method static MikrotikManager on(string $name)
+ * @method static string currentRouterName()
+ * @method static list<string> getRouterNames(?string $group = null)
+ * @method static FleetManager fleet()
+ * @method static DiagnosticsManager diagnostics()
+ * @method static ExportManager export()
  * @method static PppoeManager pppoe()
  * @method static HotspotManager hotspot()
  * @method static QueueManager queue()

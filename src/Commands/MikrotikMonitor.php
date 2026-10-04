@@ -81,11 +81,9 @@ class MikrotikMonitor extends Command
     protected function poll(string $routerName): int
     {
         try {
-            $manager = app(MikrotikManager::class);
-
-            if ($routerName !== 'default') {
-                $manager->router($routerName);
-            }
+            // on() pins every call below to this router — router() would
+            // reset after the first manager call and hit 'default' instead.
+            $manager = app(MikrotikManager::class)->on($routerName);
 
             $resources = $manager->system()->getResources();
             $identity = $manager->system()->getIdentity();

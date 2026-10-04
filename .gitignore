@@ -6,5 +6,6 @@
 .php-cs-fixer.cache
 .vscode/
 .idea
-.claude
-.claude/
+.claude/*
+!.claude/CLAUDE.md
+

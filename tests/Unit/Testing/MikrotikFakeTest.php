@@ -148,3 +148,16 @@ it('router() state resets to default after each manager call', function () {
     // Both calls succeed without throwing — state was reset correctly
     expect($fake->assertQueryCount(2))->toBeNull();
 });
+
+// ─── on() / fleet() ───────────────────────────────────────────
+
+it('records queries made through on() and fleet() on the same fake', function () {
+    config()->set('mikrotik.routers', ['branch' => ['host' => '10.0.0.2']]);
+    $fake = MikrotikFake::fake(['/system/identity/print' => [['name' => 'core']]]);
+
+    MikroTik::on('branch')->system()->getIdentity();
+    $result = MikroTik::fleet()->each(fn (MikrotikManager $r) => $r->system()->getIdentity());
+
+    expect($result->successful())->toBe(['default' => 'core', 'branch' => 'core']);
+    $fake->assertQueryCount(3);
+});

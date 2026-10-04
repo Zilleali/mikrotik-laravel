@@ -50,6 +50,7 @@ final class MikrotikFake extends MikrotikManager
     {
         $fake = new static(config('mikrotik', ['host' => '127.0.0.1', 'port' => 8728]));
         $fake->fakeResponses = $responses;
+        $fake->fakeClient = new FakeRouterosClient($responses, []);
 
         app()->instance(MikrotikManager::class, $fake);
         app()->instance('mikrotik', $fake);
